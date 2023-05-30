@@ -1,68 +1,48 @@
 import React, { useState } from "react";
-// import Cookies from "universal-cookie";
 import axios from "axios";
 import "../auth/Auth.css";
 import login from "../assets/header_logo-transformed-removebg-preview.png";
-// import { Await } from "react-router-dom";
 
 const Login = () => {
-  // const [form, setForm] = useState(inisialState);
-  // const [isSigneup, setIsSigneup] = useState(true);
-
   const [errorServer, seterrorServer] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
-  const doLogin = async () => {
-    try{
-      const response = await axios.post("http://localhost/ircapi/auth/signup.php",{
-        email: email,
-        password: password,
-      });
+  const doLogin = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post(
+        "http://localhost/ircapi/auth/login.php",
+        {
+          email: email,
+          password: password,
+        },
+        // {
+        //   headers: {
+        //     "Content-Type": "application/json",
+        //     "Access-Control-Allow-Origin": "http://localhost:3000",
+        //     "Access-Control-Allow-Methods": "POST, OPTIONS",
+        //     "Access-Control-Allow-Headers": "Content-Type",
+        //   },
+        // }
+      );
+
       console.log(response.data);
-    }catch(error){
+
+      if (response.data.status) {
+        window.location.href = "./home";
+      } else {
+        setErrorMessage(response.data.message);
+      }
+
+      setEmail("");
+      setPassword("");
+    } catch (error) {
       console.error(error);
       seterrorServer(true);
     }
   };
-
-  // const handleChange = (e) => {
-  //   setForm({ ...form, [e.target.name]: e.target.value });
-  // };
-
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-
-  //   const { fullName, username, password, phoneNumber, avatarURL } = form;
-
-  //   const URL = "";
-
-  //   const {
-  //     data: { token, userId, hashedPassword },
-  //   } = await axios.post(`${URL}/${isSigneup ? "signup" : "login"}`, {
-  //     username,
-  //     phoneNumber,
-  //     password,
-  //     avatarURL,
-  //     fullName,
-  //   });
-
-  //   cookies.set("token", token);
-  //   cookies.set("username", username);
-  //   cookies.set("fullName", fullName);
-  //   cookies.set("userId", userId);
-
-  //   if (isSigneup) {
-  //     cookies.set("phoneNumber", phoneNumber);
-  //     cookies.set("avatarURL", avatarURL);
-  //     cookies.set("hashedPassword", hashedPassword);
-  //   }
-
-  //   window.location.reload();
-  // };
-  // const switchMode = () => {
-  //   setIsSigneup((prevIsSignup) => !prevIsSignup);
-  // };
 
   return (
     <div className="auth__form-container">
@@ -71,23 +51,8 @@ const Login = () => {
           <img src={login} alt="" />
         </div>
         <div className="auth__form-container_fields-content">
-          {errorServer ? <p>errooooooor</p> : ""}
-
-          <form>
+          <form onSubmit={doLogin}>
             <p>Login</p>
-            {/* {isSigneup && (
-              <div className="auth__form-container_fields-content_input">
-                <label htmlFor="fullName">Nom et prénom</label>
-                <input
-                  name="fullName"
-                  type="text"
-                  placeholder="Nom et prénom"
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-            )} */}
-
             <div className="auth__form-container_fields-content_input">
               <label htmlFor="fullName">E-mail</label>
               <input
@@ -99,18 +64,6 @@ const Login = () => {
                 required
               />
             </div>
-            {/* {isSigneup && (
-              <div className="auth__form-container_fields-content_input">
-                <label htmlFor="phoneNumber">Numéro de téléphone</label>
-                <input
-                  name="phoneNumber"
-                  type="text"
-                  placeholder="Numéro de téléphone"
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-            )} */}
             <div className="auth__form-container_fields-content_input">
               <label htmlFor="password">Mot de passe</label>
               <input
@@ -122,23 +75,10 @@ const Login = () => {
                 required
               />
             </div>
-            {/* {isSigneup && (
-              <div className="auth__form-container_fields-content_input">
-                <label htmlFor="confirmpassword">
-                  Confirmer le mot de passe
-                </label>
-                <input
-                  name="confirmpassword"
-                  type="password"
-                  placeholder="Confirmer le mot de passe"
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-            )} */}
             <div className="auth__form-container_fields-content_button">
-              <button type="button" onClick={doLogin}>S'identifier</button>
+              <button type="submit">S'identifier</button>
             </div>
+            {errorMessage && <div className="error-message">email or password is invalid</div>}
           </form>
         </div>
         <div className="auth__form-container_fields-account">
