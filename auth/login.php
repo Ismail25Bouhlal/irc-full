@@ -2,46 +2,52 @@
 header("Access-Control-Allow-Origin: http://localhost:3000");
 header("Access-Control-Allow-Methods: POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
+header('Content-Type: application/json; charset=UTF-8');
 require_once('../config/dbconfig.php');
 
-$data = json_decode(file_get_contents('php://input'), true); // Receive data from React code
+$requestData = json_decode(file_get_contents('php://input'), true);
 
-if (isset($data['email']) && isset($data['password'])) {
-    $email = htmlspecialchars($data['email']);
-    $password = htmlspecialchars($data['password']);
+$response = array("error" => false);
+$email = isset($requestData['email']) ? sanitizeInput($requestData['email']) : null;
+$password = isset($requestData['password']) ? sanitizeInput($requestData['password']) : null;
 
-    $conn = new mysqli('localhost', 'root', '', 'irc');
-
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    }
-
-    $stmt = $conn->prepare("SELECT * FROM users WHERE email = ?");
-    $stmt->bind_param("s", $email);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    if ($result->num_rows == 1) {
-        $user = $result->fetch_assoc();
-        if ($password == $user['password']) {
-            $response['status'] = true;
-            $response['message'] = "Login successful";
-            $response['user'] = $user;
-        } else {
-            $response['status'] = false;
-            $response['message'] = "Incorrect password";
-        }
-    } else {
-        $response['status'] = false;
-        $response['message'] = "User not found";
-    }
-
-    $conn->close();
+if (!$email) {
+    $error = "Email is required";
+    $response['error'] = true;
+    $response['error_msg'] = $error;
+    echo json_encode($response);
+    exit();
+} elseif (!$password) {
+    $error = "Password is required";
+    $response['error'] = true;
+    $response['error_msg'] = $error;
+    echo json_encode($response);
+    exit();
 } else {
-    $response['status'] = false;
-    $response['message'] = "Invalid data received";
+    $loginQuery = "SELECT * FROM `users` WHERE `email` = ? AND `password` = ?";
+    $stmt = mysqli_prepare($conn, $loginQuery);
+    mysqli_stmt_bind_param($stmt, "ss", $email, $password);
+    mysqli_stmt_execute($stmt);
+    mysqli_stmt_store_result($stmt);
+
+    if (mysqli_stmt_num_rows($stmt) > 0) {
+        $response['message'] = "Login successful";
+        $response['error'] = false;
+        echo json_encode($response);
+    } else {
+        $response['message'] = "Invalid email or password";
+        $response['error'] = true;
+        echo json_encode($response);
+    }
+
+    mysqli_stmt_close($stmt);
 }
 
-header('Content-Type: application/json; charset=UTF-8');
-echo json_encode($response);
+function sanitizeInput($input)
+{
+    $input = trim($input);
+    $input = stripslashes($input);
+    $input = htmlspecialchars($input);
+    return $input;
+}
 ?>
