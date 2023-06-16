@@ -1,9 +1,12 @@
 import React, { useState } from "react";
+// import { useHistory } from "react-router-dom";
+import { createBrowserHistory } from "history";
 import axios from "axios";
 import "../auth/Auth.css";
 import login from "../assets/header_logo-transformed-removebg-preview.png";
 
 const Login = () => {
+  const history = createBrowserHistory();
   const [errorServer, seterrorServer] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -17,21 +20,13 @@ const Login = () => {
         {
           email: email,
           password: password,
-        },
-        // {
-        //   headers: {
-        //     "Content-Type": "application/json",
-        //     "Access-Control-Allow-Origin": "http://localhost:3000",
-        //     "Access-Control-Allow-Methods": "POST, OPTIONS",
-        //     "Access-Control-Allow-Headers": "Content-Type",
-        //   },
-        // }
+        }
       );
 
       console.log(response.data);
 
       if (response.data.status) {
-        window.location.href = "./home";
+        window.location.href = "./home"
       } else {
         setErrorMessage(response.data.message);
       }
@@ -84,7 +79,7 @@ const Login = () => {
         <div className="auth__form-container_fields-account">
           <p>
             Vous n'avez pas de compte ?
-            <a href="/signeup">
+            <a href="/signup">
               <span>S'identifier</span>
             </a>
           </p>
