@@ -1,0 +1,12 @@
+body {
+  font-family: "Libre Baskerville", serif;
+  font-weight: 400;
+  font-size: 16px;
+  background-color: #e4d2d2;
+  overflow-x: hidden;
+  color: #ffffff;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  box-sizing: border-box;
+}

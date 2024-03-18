@@ -1,0 +1,231 @@
+/* projet.css */
+
+.projet-container {
+  display: flex;
+  height: 100vh;
+}
+
+.sidebar {
+  width: 240px;
+  background-color: #1e2530; /* Light Gray */
+  color: #009444; /* Olive Green */
+  padding: 20px;
+  display: flex;
+  height: 95.7vh;
+  flex-direction: column;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s; /* Added transition for box-shadow */
+}
+
+.sidebar-item {
+  cursor: pointer;
+  padding: 15px;
+  margin-bottom: 12px;
+  color: #009444;
+  transition: background-color 0.3s, transform 0.2s ease-in-out; /* Added transform animation */
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+  position: relative;
+}
+
+.page-title {
+  text-align: center;
+  margin: 20px 0;
+}
+
+.page-title h1 {
+  color: #000000; /* Black title color */
+}
+
+.sidebar-item svg {
+  margin-right: 15px;
+  font-size: 20px;
+}
+
+.sidebar-item:hover {
+  background-color: #e0f2e9;
+  color: #007a36;
+  transform: scale(1.05); /* Slight scale-up on hover for animation */
+}
+
+.sidebar-item.active {
+  background-color: #009444;
+  color: white;
+}
+
+.logo-container {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.logo {
+  max-width: 80%;
+  height: auto;
+}
+
+@keyframes pulse {
+  to {
+    transform: scale(1.05); /* Adjusted pulsating scale for logo */
+  }
+}
+
+.content {
+  flex: 1;
+  padding: 20px;
+}
+
+@media (max-width: 768px) {
+  .projet-container {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Adjusted box-shadow for mobile view */
+  }
+}
+
+/* competition section  */
+
+.competition-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap; /* Allow cards to wrap to the next line */
+}
+
+.competition-card {
+  background-color: #ffffff; /* White background */
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  width: 300px; /* Adjust as needed */
+  margin: 10px;
+  text-align: left;
+  transition: transform 0.2s ease-in-out; /* Added transform animation */
+  position: relative;
+}
+
+.competition-card:hover {
+  transform: scale(1.05); /* Slight scale-up on hover for animation */
+}
+
+.card-title {
+  color: #000000; /* Black title color */
+  margin-bottom: 10px;
+}
+
+.competition-card p {
+  margin-bottom: 5px;
+}
+
+.action {
+  margin-top: 15px;
+}
+
+.apply-button {
+  background-color: #009444; /* Olive Green */
+  color: #ffffff; /* White text color */
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  width: 100%;
+  justify-content: center;
+}
+
+.apply-button:hover {
+  background-color: #007a36; /* Darker Olive Green on hover */
+}
+
+.unavailable {
+  color: #ff0000; /* Gray text color for unavailable */
+}
+
+/* forum part */
+.add-competition {
+  display: flex;
+  align-items: center;
+  font-size: 20px;
+  margin-top: 3rem;
+  margin-left: 28rem;
+}
+
+.settings-form h2 {
+  color: #000000;
+  padding-bottom: 40px;
+}
+
+.settings-form {
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  max-width: 800px; /* Adjusted max width for better readability */
+  margin: 0 auto; /* Center the form horizontally */
+}
+
+.settings-form label {
+  font-weight: bold;
+  color: #000000;
+}
+
+.settings-form input[type="text"],
+.settings-form input[type="date"],
+.settings-form select,
+.settings-form button[type="submit"] {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  border: 1px solid black;
+  border-radius: 5px;
+  font-size: 16px;
+  color: black;
+  box-sizing: border-box;
+  transition: border-color 0.3s, box-shadow 0.3s; /* Added transition effect */
+}
+
+.settings-form input[type="text"]:focus,
+.settings-form input[type="date"]:focus,
+.settings-form select:focus {
+  border-color: green; /* Highlight border on focus */
+  box-shadow: 0 0 5px rgba(0, 128, 0, 0.5); /* Add shadow effect on focus */
+}
+
+.settings-form input[type="radio"] {
+  margin-right: 5px;
+}
+
+.settings-form button[type="submit"] {
+  background-color: green;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  margin-top: 15px;
+  width: 25%;
+  text-align: center;
+}
+
+.settings-form button[type="submit"]:hover {
+  background-color: darkgreen;
+}
+
+.settings-form .form-group {
+  margin-bottom: 20px;
+}
+
+.settings-form a {
+  color: green;
+  text-decoration: none;
+}
+
+.settings-form a:hover {
+  text-decoration: underline;
+}

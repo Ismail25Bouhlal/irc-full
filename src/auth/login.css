@@ -1,0 +1,115 @@
+.login-container {
+  background-color: #e4d2d2;
+  margin: 0;
+  font-family: "Arial", sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  padding-left: 43rem;
+}
+
+.login-card {
+  background-color: #e4d2d2;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  border-radius: 15px;
+  overflow: hidden;
+  width: 400px;
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+.login-card:hover {
+  /* transform: scale(1.05); */
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.2);
+}
+
+.login-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.login-card p {
+  font-size: 2rem;
+  color: #065a3a;
+  font-weight: bold;
+  margin: 1.5rem 0;
+  transition: color 0.3s ease-in-out;
+}
+
+.input-container {
+  padding: 1.5rem;
+}
+
+.input-container label {
+  display: block;
+  font-size: 1rem;
+  color: #444;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  transition: color 0.3s ease-in-out;
+}
+
+.input-container input {
+  width: 100%;
+  padding: 1rem;
+  border: none;
+  border-bottom: 2px solid #ccc;
+  font-size: 1.2rem;
+  background-color: #e4d2d2;
+  outline: none;
+  transition: border-color 0.3s ease-in-out, background-color 0.3s ease-in-out;
+}
+
+.input-container input:focus {
+  border-color: #065a3a;
+  background-color: #e4d2d2;
+}
+
+.button-container {
+  padding: 1.5rem;
+}
+
+.button-container button {
+  width: 100%;
+  border: none;
+  border-radius: 8px;
+  background: #065a3a;
+  color: #fff;
+  font-family: "Arial", sans-serif;
+  font-weight: bold;
+  padding: 1rem;
+  outline: none;
+  cursor: pointer;
+  transition: background 0.3s ease-in-out;
+}
+
+.button-container button:hover {
+  background: #044526;
+}
+
+.error-message {
+  color: red;
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.account-link p {
+  margin-top: 1.5rem;
+  font-size: 15px;
+  color: #444;
+  text-align: center;
+  transition: color 0.3s ease-in-out;
+}
+
+.account-link a {
+  color: #065a3a;
+  text-decoration: none;
+  font-weight: bold;
+  transition: color 0.3s ease-in-out;
+}
+
+.account-link a:hover {
+  text-decoration: underline;
+  color: #044526;
+}

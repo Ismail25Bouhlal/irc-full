@@ -1,32 +1,33 @@
 import React, { useState } from "react";
-// import { useHistory } from "react-router-dom";
-import { createBrowserHistory } from "history";
 import axios from "axios";
-import "../auth/Auth.css";
-import login from "../assets/header_logo-transformed-removebg-preview.png";
+import logo from "../../src/assets/irc-logo-rb.png";
+import { useNavigate } from "react-router-dom";
+import "./login.css";
+import Cookies from "js-cookie";
 
-const Login = () => {
-  const history = createBrowserHistory();
-  const [errorServer, seterrorServer] = useState(false);
+const Login = ({ onLogin }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const navigate = useNavigate();
 
   const doLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(
-        "http://localhost/ircapi/auth/login.php",
-        {
-          email: email,
-          password: password,
-        }
-      );
+      const response = await axios.post("http://localhost/irc/login.php", {
+        email: email, // Ensure that 'email' is a plain string without encoding
+        password: password,
+      });
 
-      console.log(response.data);
+      if (
+        response.data.role === "administrateur" ||
+        response.data.role === "chercheur"
+      ) {
+        // Set email in cookies
+        Cookies.set("email", email, { expires: 30 }); // Expires in 30 days
 
-      if (response.data.status) {
-        window.location.href = "./home"
+        navigate("/home");
+        onLogin(response.data.role); // Pass the role as an argument
       } else {
         setErrorMessage(response.data.message);
       }
@@ -35,23 +36,23 @@ const Login = () => {
       setPassword("");
     } catch (error) {
       console.error(error);
-      seterrorServer(true);
+      setErrorMessage("An error occurred. Please try again.");
     }
   };
 
   return (
-    <div className="auth__form-container">
-      <div className="auth__form-container_fields">
-        <div className="auth__form-container_image ">
-          <img src={login} alt="" />
-        </div>
-        <div className="auth__form-container_fields-content">
+    <div className="login-container">
+      <div className="login-image">
+        <img src={logo} alt="" />
+      </div>
+      <div className="login-card">
+        <div className="login-content">
           <form onSubmit={doLogin}>
             <p>Login</p>
-            <div className="auth__form-container_fields-content_input">
-              <label htmlFor="fullName">E-mail</label>
+            <div className="input-container">
+              <label htmlFor="email">E-mail</label>
               <input
-                name="Email"
+                name="email"
                 type="text"
                 placeholder="E-mail"
                 value={email}
@@ -59,7 +60,7 @@ const Login = () => {
                 required
               />
             </div>
-            <div className="auth__form-container_fields-content_input">
+            <div className="input-container">
               <label htmlFor="password">Mot de passe</label>
               <input
                 name="password"
@@ -70,17 +71,19 @@ const Login = () => {
                 required
               />
             </div>
-            <div className="auth__form-container_fields-content_button">
+            <div className="button-container">
               <button type="submit">S'identifier</button>
             </div>
-            {errorMessage && <div className="error-message">email or password is invalid</div>}
+            {errorMessage && (
+              <div className="error-message">{errorMessage}</div>
+            )}
           </form>
         </div>
-        <div className="auth__form-container_fields-account">
+        <div className="account-link">
           <p>
-            Vous n'avez pas de compte ?
+            Vous n'avez pas de compte ?{" "}
             <a href="/signup">
-              <span>S'identifier</span>
+              <span>S'inscrire</span>
             </a>
           </p>
         </div>
