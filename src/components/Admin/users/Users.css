@@ -1,0 +1,95 @@
+/* Users.css */
+.main-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Full viewport height */
+  width: calc(100% - 750px); /* Adjust width considering the sidebar width */
+  margin-left: 650px; /* Adjust for the sidebar */
+}
+
+.main-content {
+  width: 70%;
+  max-width: 1200px;
+  color: #333333; /* Dark text color */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+  margin-left: -15px;
+}
+
+.content-title {
+  color: #000000; /* Black title */
+  text-align: center;
+  margin-top: -80%;
+}
+
+.table-container {
+  width: 250%;
+  overflow-x: auto; /* Horizontal scrolling */
+  overflow-y: auto; /* Vertical scrolling */
+  max-height: 500px; 
+  border: 1px solid #838383; /* Gray border */
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  background-color: #ffffff; /* White background */
+}
+
+.table th,
+.table td {
+  padding: 10px;
+  border: 1px solid #969696; /* Gray border */
+  text-align: left;
+}
+
+.table th {
+  background-color: green;
+  color: #ffffff; /* White text */
+  position: sticky;
+  top: 0; /* Stick to the top */
+  z-index: 1;
+}
+
+.table tbody tr:nth-child(even) {
+  background-color: #f2f2f2; /* Alternate row color */
+}
+
+.action-btn {
+  padding: 5px 10px;
+  font-size: 14px;
+  border-radius: 4px;
+  margin-right: 2px;
+  transition: background-color 0.3s ease;
+}
+
+.action-btn:hover {
+  opacity: 0.9;
+}
+
+.eva.action-btn {
+  background-color: #007bff;
+  border-color: #007bff;
+  color: #ffffff; /* White text */
+}
+
+.eva.action-btn:hover {
+  background-color: #0056b3;
+  border-color: #004085;
+}
+
+.del.action-btn {
+  background-color: #dc3545;
+  border-color: #dc3545;
+  color: #ffffff; /* White text */
+}
+
+.del.action-btn:hover {
+  background-color: #c82333;
+  border-color: #bd2130;
+}

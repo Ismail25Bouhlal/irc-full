@@ -1,9 +1,12 @@
 import React from "react";
-import "./navbar.css";
+import "./navbar-ad.css";
 import logo from "../../../assets/irc-logo-rb.png";
 import { Link } from "react-router-dom";
 import { AiFillFolderOpen } from "react-icons/ai";
-import { AiFillQuestionCircle } from "react-icons/ai";
+import { FaUserMd } from "react-icons/fa";
+import { IoSettings } from "react-icons/io5";
+import { FaUsers } from "react-icons/fa";
+
 
 const style = {
   container: {
@@ -41,15 +44,15 @@ const Navbar = () => {
   return (
     <div className="site-wrapper">
       <div className="auth__form-container_image">
-          <img src={logo} alt="" />
-          <ul className="nav-links">
-            <Link to="/Mon-compte">
-              <li>Mon Compte</li>
-            </Link>
-            <Link to="/login">
-              <li>Se deconnecter</li>
-            </Link>
-          </ul>
+        <img src={logo} alt="" />
+        <ul className="nav-links">
+          <Link to="/Mon-compte">
+            <li>Mon Compte</li>
+          </Link>
+          <Link to="/login">
+            <li>Se deconnecter</li>
+          </Link>
+        </ul>
       </div>
       <div className="pt-table desktop-768" style={style.centeredContainer}>
         <div
@@ -117,14 +120,14 @@ const Navbar = () => {
                       <div></div>
                       <div></div>
                     </div>
-                    <Link to="/about" className="hex-content">
+                    <Link to="/comite" className="hex-content">
                       <span className="hex-content-inner">
                         {/* <span className="icon"> */}
                         <i>
-                          <AiFillQuestionCircle className="ic" />
+                          <FaUserMd className="ic" />
                         </i>
                         {/* </span> */}
-                        <span className="title">à propos</span>
+                        <span className="title">Comite</span>
                       </span>
                       <svg
                         viewBox="0 0 173.20508075688772 200"
@@ -151,12 +154,45 @@ const Navbar = () => {
                       <div></div>
                       <div></div>
                     </div>
+                    
+                    <Link to="/parametre" className="hex-content">
+                      <span className="hex-content-inner">
+                        <span className="icon">
+                          <i><IoSettings className="ic" /></i>
+                        </span>
+                        <span className="title">Parmetre</span>
+                      </span>
+                      <svg
+                        viewBox="0 0 173.20508075688772 200"
+                        height="200"
+                        width="174"
+                        version="1.1"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M86.60254037844386 0L173.20508075688772 50L173.20508075688772 150L86.60254037844386 200L0 150L0 50Z"
+                          fill="#1e2530"
+                        ></path>
+                      </svg>
+                    </Link>
+                  </div>
+                  <Link to="/Utislisatuers" className="hexagon-item">
+                    <div className="hex-item">
+                      <div></div>
+                      <div></div>
+                      <div></div>
+                    </div>
+                    <div className="hex-item">
+                      <div></div>
+                      <div></div>
+                      <div></div>
+                    </div>
                     <a className="hex-content">
                       <span className="hex-content-inner">
                         <span className="icon">
-                          <i className="fa fa-braille"></i>
+                          <i><FaUsers className="ic" /></i>
                         </span>
-                        <span className="title">Services</span>
+                        <span className="title">Utilisateurs</span>
                       </span>
                       <svg
                         viewBox="0 0 173.20508075688772 200"
@@ -171,39 +207,7 @@ const Navbar = () => {
                         ></path>
                       </svg>
                     </a>
-                  </div>
-                  <div className="hexagon-item">
-                    <div className="hex-item">
-                      <div></div>
-                      <div></div>
-                      <div></div>
-                    </div>
-                    <div className="hex-item">
-                      <div></div>
-                      <div></div>
-                      <div></div>
-                    </div>
-                    <a className="hex-content">
-                      <span className="hex-content-inner">
-                        <span className="icon">
-                          <i className="fa fa-id-badge"></i>
-                        </span>
-                        <span className="title">Resume</span>
-                      </span>
-                      <svg
-                        viewBox="0 0 173.20508075688772 200"
-                        height="200"
-                        width="174"
-                        version="1.1"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M86.60254037844386 0L173.20508075688772 50L173.20508075688772 150L86.60254037844386 200L0 150L0 50Z"
-                          fill="#1e2530"
-                        ></path>
-                      </svg>
-                    </a>
-                  </div>
+                  </Link>
                   <div className="hexagon-item">
                     <div className="hex-item">
                       <div></div>

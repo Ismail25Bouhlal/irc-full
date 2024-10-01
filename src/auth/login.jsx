@@ -15,19 +15,28 @@ const Login = ({ onLogin }) => {
     e.preventDefault();
     try {
       const response = await axios.post("http://localhost/irc/login.php", {
-        email: email, // Ensure that 'email' is a plain string without encoding
+        email: email,
         password: password,
       });
 
       if (
         response.data.role === "administrateur" ||
-        response.data.role === "chercheur"
+        response.data.role === "chercheur" ||
+        response.data.role === "evaluateur"
       ) {
-        // Set email in cookies
-        Cookies.set("email", email, { expires: 30 }); // Expires in 30 days
+        Cookies.set("email", email, { expires: 30 });
 
-        navigate("/home");
-        onLogin(response.data.role); // Pass the role as an argument
+        // If the user is a chercheur or evaluateur, redirect to profile selection
+        if (
+          response.data.role === "chercheur" ||
+          response.data.role === "evaluateur"
+        ) {
+          navigate("/select-profile");
+        } else {
+          // For admin, directly navigate to home
+          navigate("/home");
+          onLogin(response.data.role);
+        }
       } else {
         setErrorMessage(response.data.message);
       }
@@ -41,54 +50,56 @@ const Login = ({ onLogin }) => {
   };
 
   return (
-    <div className="login-container">
+    <>
       <div className="login-image">
         <img src={logo} alt="" />
       </div>
-      <div className="login-card">
-        <div className="login-content">
-          <form onSubmit={doLogin}>
-            <p>Login</p>
-            <div className="input-container">
-              <label htmlFor="email">E-mail</label>
-              <input
-                name="email"
-                type="text"
-                placeholder="E-mail"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
-            <div className="input-container">
-              <label htmlFor="password">Mot de passe</label>
-              <input
-                name="password"
-                type="password"
-                placeholder="Mot de passe"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
-            <div className="button-container">
-              <button type="submit">S'identifier</button>
-            </div>
-            {errorMessage && (
-              <div className="error-message">{errorMessage}</div>
-            )}
-          </form>
-        </div>
-        <div className="account-link">
-          <p>
-            Vous n'avez pas de compte ?{" "}
-            <a href="/signup">
-              <span>S'inscrire</span>
-            </a>
-          </p>
+      <div className="login-container">
+        <div className="login-card">
+          <div className="login-content">
+            <form onSubmit={doLogin}>
+              <p>Login</p>
+              <div className="input-container">
+                <label htmlFor="email">E-mail</label>
+                <input
+                  name="email"
+                  type="text"
+                  placeholder="E-mail"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="input-container">
+                <label htmlFor="password">Mot de passe</label>
+                <input
+                  name="password"
+                  type="password"
+                  placeholder="Mot de passe"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="button-container">
+                <button type="submit">S'identifier</button>
+              </div>
+              {errorMessage && (
+                <div className="error-message">{errorMessage}</div>
+              )}
+            </form>
+          </div>
+          <div className="account-link">
+            <p>
+              Vous n'avez pas de compte ?{" "}
+              <a href="/signup">
+                <span>S'inscrire</span>
+              </a>
+            </p>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

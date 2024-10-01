@@ -8,6 +8,15 @@ import formation from "./formation.json";
 import medical from "./medical.json";
 import autre from "./autre.json";
 import soin from "./soin.json";
+import "./Notification.css";
+
+const Notification = ({ message, onClose }) => (
+  <div className="notification">
+    <p>{message}</p>
+    <button onClick={onClose}>Fermer</button>{" "}
+    {/* Close button for manual dismiss */}
+  </div>
+);
 
 const Compte = () => {
   const [userInformation, setUserInformation] = useState(null);
@@ -22,7 +31,6 @@ const Compte = () => {
   const [otherValueOrganisme, setOtherValueOrganisme] = useState("");
   const [showDropdownOrganisme, setShowDropdownOrganisme] = useState(false);
   const [showProfileCompletion, setShowProfileCompletion] = useState(false);
-  const [selectedSpecialty, setSelectedSpecialty] = useState("Médicale");
   const [selectedInterests, setSelectedInterests] = useState({
     Epidemiologie: false,
     EssaisCliniques: false,
@@ -33,6 +41,12 @@ const Compte = () => {
   });
   const [selectedItem, setSelectedItem] = useState("");
   const [selectedOptionMiatrise, setSelectedOptionMiatrise] = useState("");
+  const [selectedSpecialty, setSelectedSpecialty] = useState("Médicale"); // Separate state for specialty
+  const [selectedSpecialtyItem, setSelectedSpecialtyItem] = useState(""); // State for the medical/other specialty dropdown
+  const [selectedOrganisme, setSelectedOrganisme] = useState(""); // State for the organisme type
+  const [selectedOrganismeItem, setSelectedOrganismeItem] = useState("");
+  const [showNotification, setShowNotification] = useState(false); // Control notification visibility
+  const [notificationMessage, setNotificationMessage] = useState("");
 
   const email = Cookies.get("email");
 
@@ -54,6 +68,26 @@ const Compte = () => {
     }
   }, [email]);
 
+  useEffect(() => {
+    // Retrieve saved selections from localStorage
+    const savedSpecialtyItem = localStorage.getItem("selectedSpecialtyItem");
+    if (savedSpecialtyItem) setSelectedSpecialtyItem(savedSpecialtyItem);
+
+    const savedOptionStatus = localStorage.getItem("selectedOptionStatus");
+    if (savedOptionStatus) setSelectedOptionStatus(savedOptionStatus);
+
+    const savedOptionOrganisme = localStorage.getItem(
+      "selectedOptionOrganisme"
+    );
+    if (savedOptionOrganisme) setSelectedOptionOrganisme(savedOptionOrganisme);
+
+    const savedOrganismeItem = localStorage.getItem("selectedOrganismeItem");
+    if (savedOrganismeItem) setSelectedOrganismeItem(savedOrganismeItem);
+
+    const savedOptionMiatrise = localStorage.getItem("selectedOptionMiatrise");
+    if (savedOptionMiatrise) setSelectedOptionMiatrise(savedOptionMiatrise);
+  }, []);
+
   const handlePasswordChange = async (e) => {
     e.preventDefault();
     try {
@@ -65,26 +99,6 @@ const Compte = () => {
           newPassword: newPassword,
         }
       );
-
-      const handleSaveUserInfo = async () => {
-        try {
-          const response = await axios.post(
-            "http://localhost/irc/saveUserInfo.php",
-            {
-              selectedSpecialty,
-              selectedItem,
-              selectedOptionStatus,
-              selectedOptionOrganisme,
-              selectedInterests,
-            }
-          );
-          console.log(response.data);
-          // Handle response if needed
-        } catch (error) {
-          console.error("Error saving user information:", error);
-        }
-      };
-
       if (!response.data.error) {
         // Password updated successfully, you can update UI accordingly
         setErrorMessage("");
@@ -95,6 +109,55 @@ const Compte = () => {
     } catch (error) {
       console.error("Error updating password:", error);
       setErrorMessage("An error occurred. Please try again.");
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const email = Cookies.get("email"); // Get the email from cookies
+
+    const data = {
+      email, // Include the email in the data object
+      selectedSpecialty: selectedSpecialty,
+      type_organisme: selectedOptionOrganisme,
+      specialite_formation: selectedItem,
+      domaine_maitrise: selectedOptionMiatrise,
+      domaine_dinteret: JSON.stringify(selectedInterests),
+      specialite: selectedSpecialtyItem,
+      statut: selectedOptionStatus,
+      selected_organisme: selectedOrganismeItem,
+    };
+
+    try {
+      const response = await axios.post(
+        "http://localhost/irc/saveUserInfo.php",
+        data,
+        {
+          headers: {
+            "Content-Type": "application/json", // send data as JSON
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        // Set the message in French
+        setNotificationMessage("Données enregistrées avec succès !");
+        setShowNotification(true); // Show the notification
+
+        // Optionally, auto-dismiss the notification after 3 seconds
+        setTimeout(() => {
+          setShowNotification(false);
+        }, 3000);
+      }
+
+      if (response.status === 200) {
+        console.log("Data saved successfully:", response.data);
+      } else {
+        console.error("Error from server:", response.data);
+      }
+    } catch (error) {
+      console.error("Error during request:", error);
     }
   };
 
@@ -117,6 +180,7 @@ const Compte = () => {
     } else {
       setShowDropdownStatus(false);
     }
+    localStorage.setItem("selectedOptionStatus", value);
   };
 
   const handleOptionChangeOrganisme = (e) => {
@@ -130,17 +194,46 @@ const Compte = () => {
     } else {
       setShowDropdownOrganisme(false);
     }
+    localStorage.setItem("selectedOptionOrganisme", value);
   };
 
   const handleCompleterProfileClick = () => {
     setShowProfileCompletion(true);
   };
 
-  const handleSpecialtyChange = (e) => {
-    setSelectedSpecialty(e.target.value);
-  };
   const handleDropdownChange = (event) => {
     setSelectedItem(event.target.value);
+  };
+
+  const handleSpecialtyChange = (e) => {
+    setSelectedSpecialty(e.target.value);
+    setSelectedSpecialtyItem(""); // Reset selected specialty item when changing main specialty
+  };
+
+  const handleSpecialtyItemChange = (e) => {
+    setSelectedSpecialtyItem(e.target.value);
+    const value = e.target.value;
+    setSelectedSpecialtyItem(value);
+    localStorage.setItem("selectedSpecialtyItem", value);
+  };
+
+  const handleOrganismeChange = (e) => {
+    setSelectedOrganisme(e.target.value);
+    setSelectedOrganismeItem(""); // Reset selected organisme item when changing main organisme
+  };
+  const handleCloseNotification = () => {
+    setShowNotification(false); // Manually close the notification
+  };
+  const handleOrganismeItemChange = (e) => {
+    setSelectedOrganismeItem(e.target.value);
+    const value = e.target.value;
+    setSelectedOrganismeItem(value);
+    localStorage.setItem("selectedOrganismeItem", value);
+  };
+  const handleOptionChangeMiatrise = (e) => {
+    const newValue = e.target.value;
+    setSelectedOptionMiatrise(newValue);
+    localStorage.setItem('selectedOptionMiatrise', newValue);  // Update state when a new option is selected
   };
 
   return (
@@ -232,9 +325,9 @@ const Compte = () => {
                         <strong>specialite</strong>
                       </p>
                       <select
-                        value={selectedItem}
+                        value={selectedSpecialtyItem}
                         className="input-field"
-                        onChange={handleDropdownChange}
+                        onChange={handleSpecialtyItemChange}
                       >
                         <option value="">choisir votre specialite</option>
                         {medical.map((item, index) => (
@@ -251,9 +344,9 @@ const Compte = () => {
                         <strong>specialite</strong>
                       </p>
                       <select
-                        value={selectedItem}
+                        value={selectedSpecialtyItem}
                         className="input-field"
-                        onChange={handleDropdownChange}
+                        onChange={handleSpecialtyItemChange}
                       >
                         <option value="">choisir votre specialite</option>
                         {autre.map((item, index) => (
@@ -272,6 +365,7 @@ const Compte = () => {
                     value={selectedOptionStatus}
                     className="input-field"
                     onChange={handleOptionChangeStatus}
+                    required
                   >
                     <option value="">Selectionnez votre status</option>
                     <option value="Professeur agrégé">Professeur agrégé</option>
@@ -345,9 +439,9 @@ const Compte = () => {
                         </strong>
                       </p>
                       <select
-                        value={selectedItem}
+                        value={selectedOrganismeItem}
                         className="input-field"
-                        onChange={handleDropdownChange}
+                        onChange={handleOrganismeItemChange}
                       >
                         <option value="">
                           choisir L'organisme de Formation et Recherche auquel
@@ -372,9 +466,9 @@ const Compte = () => {
                         </strong>
                       </p>
                       <select
-                        value={selectedItem}
+                        value={selectedOrganismeItem}
                         className="input-field"
-                        onChange={handleDropdownChange}
+                        onChange={handleOrganismeItemChange}
                       >
                         <option value="">
                           choisir L'organisme de Soins, Formation et Recherche
@@ -395,8 +489,11 @@ const Compte = () => {
                   <select
                     value={selectedOptionMiatrise}
                     className="input-field"
+                    onChange={handleOptionChangeMiatrise}
                   >
-                    <option value="">Selectionnez Votre Domaine de maîtrise</option>
+                    <option value="">
+                      Selectionnez Votre Domaine de maîtrise
+                    </option>
                     <option value="Épidémiologie et Santé Publique">
                       Épidémiologie et Santé Publique
                     </option>
@@ -484,14 +581,18 @@ const Compte = () => {
                       d'Utilisation Conformément à la loi 08-09, vous pouvez
                       exercer vos droits d'accès, de rectification et
                       d'opposition en vous adressons à l'unité SI & Bases de
-                      données par mail à la boite:<strong> irc_associes@irc.ma{" "}</strong>
+                      données par mail à la boite:
+                      <strong> irc_associes@irc.ma </strong>
                       <span> NB * : champ obligatoire.</span>
                     </label>
+                    {showNotification && (
+                      <Notification
+                        message={notificationMessage} // Message in French
+                        onClose={handleCloseNotification}
+                      />
+                    )}
                   </div>
-                  <button
-                    className="buttoon"
-                    onClick={() => setShowProfileCompletion(false)}
-                  >
+                  <button className="buttoon" onClick={handleSubmit}>
                     Enregistrer
                   </button>
                 </div>

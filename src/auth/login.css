@@ -1,12 +1,12 @@
 .login-container {
   background-color: #e4d2d2;
-  margin: 0;
   font-family: "Arial", sans-serif;
   display: flex;
-  justify-content: center;
   align-items: center;
   height: 100vh;
-  padding-left: 43rem;
+  width: auto;
+  left:35%;
+  position: absolute;
 }
 
 .login-card {
@@ -67,7 +67,8 @@
 }
 
 .button-container {
-  padding: 1.5rem;
+  padding: 1.6rem;
+  margin-right: 20px;
 }
 
 .button-container button {

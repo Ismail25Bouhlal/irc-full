@@ -1,0 +1,25 @@
+.btn-custom {
+  background-color: #01b399;
+  border-color: #01b399;
+}
+
+.btn-custom:hover {
+  background-color: #017a75;
+  border-color: #017a75;
+}
+
+.header-custom {
+  background-color: #01b399;
+  color: white;
+}
+
+.table-container {
+  background-color: #f8f9fa;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.table-responsive {
+  overflow-x: auto;
+}

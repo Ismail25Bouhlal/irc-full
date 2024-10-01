@@ -1,9 +1,10 @@
 import React from "react";
-import "./navbar.css";
+import "./Navbar-ev.css";
 import logo from "../../../assets/irc-logo-rb.png";
 import { Link } from "react-router-dom";
 import { AiFillFolderOpen } from "react-icons/ai";
 import { AiFillQuestionCircle } from "react-icons/ai";
+import { GoGoal } from "react-icons/go";
 
 const style = {
   container: {
@@ -15,8 +16,6 @@ const style = {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    flexDirection: "colmun",
-    minHeight: "102vh",
     // height: "100vh", // Adjust the height as needed
   },
 };
@@ -31,10 +30,11 @@ const style = {
 const text = {
   text: {
     color: "black",
-    margin: "0 auto", // Center text horizontally
-    paddingBottom: "20px", // Adjust padding to move text downward
+    marginLeft: "auto",
+    marginRight: "auto",
+    paddingLeft: "0.5rem",
+    color: "#000",
     fontFamily: '"Open Sans", sans-serif',
-    fontSize: "2.5rem", // Adjust font size as needed
   },
 };
 
@@ -65,7 +65,7 @@ const Navbar = () => {
                 <div className="page-title  home text-center">
                   <span className="heading-page" style={text.text}>
                     {" "}
-                    Bienvenue Chercheur!
+                    Bienvenue Evaluateur!
                   </span>
                   <p className="mt20">
                     Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
@@ -91,7 +91,7 @@ const Navbar = () => {
                         <i>
                           <AiFillFolderOpen className="ic" />
                         </i>
-                        <span className="title">Compétitions</span>
+                        <span className="title">Projet</span>
                       </span>
                       <svg
                         viewBox="0 0 173.20508075688772 200"
@@ -122,10 +122,12 @@ const Navbar = () => {
                       <span className="hex-content-inner">
                         {/* <span className="icon"> */}
                         <i>
-                          <AiFillQuestionCircle className="ic" />
+                          <i>
+                            <GoGoal className="ic" />
+                          </i>
                         </i>
                         {/* </span> */}
-                        <span className="title">à propos</span>
+                        <span className="title">tache</span>
                       </span>
                       <svg
                         viewBox="0 0 173.20508075688772 200"

@@ -45,21 +45,21 @@ p:last-child {
 }
 
 /*
- * Selection color
- */
+   * Selection color
+   */
 /* ::-moz-selection {
-  background-color: #fa6862;
-  color: #fff;
-}
-
-::selection {
-  background-color: #fa6862;
-  color: #fff;
-} */
+    background-color: #fa6862;
+    color: #fff;
+  }
+  
+  ::selection {
+    background-color: #fa6862;
+    color: #fff;
+  } */
 
 /*
- *  Reset bootstrap's default style
- */
+   *  Reset bootstrap's default style
+   */
 .form-control::-webkit-input-placeholder,
 ::-webkit-input-placeholder {
   opacity: 1;
@@ -130,8 +130,8 @@ label {
 }
 
 /*
- *  CSS Helper Class
- */
+   *  CSS Helper Class
+   */
 .clear:before,
 .clear:after {
   content: " ";
@@ -148,19 +148,12 @@ label {
   height: -webkit-calc(100vh - 4px);
   height: -moz-calc(100vh - 4px);
   height: calc(100vh - 4px);
+  margin-left: -14%;
 }
 
 .pt-tablecell {
   display: table-cell;
   vertical-align: middle;
-}
-
-.overlay {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
 }
 
 .relative {
@@ -282,8 +275,8 @@ label {
 }
 
 /*------------------------------------------------
-    Start Styling
--------------------------------------------------*/
+      Start Styling
+  -------------------------------------------------*/
 .mt20 {
   margin-top: 20px;
   margin-right: auto;
@@ -309,20 +302,13 @@ label {
   margin-bottom: 75px;
   color: #000000;
 }
-/* .page-title img {
-  margin-bottom: 20px;
-  margin-right: 13rem;
-} */
 
 .auth__form-container_image {
   display: flex;
   padding-right: 7rem;
   justify-content: space-between;
   align-items: center;
-  /* box-shadow: rgba(50, 50, 93, 0.23) 0 30px 30px -20px; */
-  /* width: 90%; */
 }
-
 
 .auth__form-container_image img {
   width: 30%;
@@ -407,8 +393,8 @@ label {
 }
 
 /*------------------------------------------------
-    Home Page
--------------------------------------------------*/
+      Home Page
+  -------------------------------------------------*/
 
 .hexagon-item:first-child {
   margin-left: 0;
@@ -627,8 +613,8 @@ label {
   transform: rotate(30deg) translate(87px, -80px);
 }
 /*------------------------------------------------
-    Welcome Page
--------------------------------------------------*/
+      Welcome Page
+  -------------------------------------------------*/
 .author-image-large {
   position: absolute;
   right: 0;

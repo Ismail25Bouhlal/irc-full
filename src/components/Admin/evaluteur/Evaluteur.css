@@ -1,0 +1,48 @@
+/* Evaluteur.css */
+
+/* Content styles */
+.content {
+  padding: 20px;
+}
+
+h1 {
+  color: #006400;
+  margin-bottom: 20px;
+}
+
+/* Table styles */
+.table-responsive {
+  overflow-x: auto;
+  width: 150%; /* Ensure the responsive container uses full width */
+}
+
+.evaluteur-table {
+  width: 100%; /* Make the table fill the available space */
+  max-width: 1200px; /* Set a maximum width for larger screens */
+  margin: 0 auto; /* Center the table within its container */
+  border-collapse: collapse;
+}
+
+.evaluteur-table th,
+.evaluteur-table td {
+  border: 1px solid #ddd;
+  padding: 16px; /* Increase padding for larger cells */
+  text-align: left;
+}
+
+.evaluteur-table th {
+  background-color: #006400;
+  color: white;
+}
+
+.evaluteur-table tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+.evaluteur-table tr:hover {
+  background-color: #d1e7dd;
+}
+
+.evaluteur-table td {
+  color: #333;
+}
