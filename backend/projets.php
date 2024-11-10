@@ -1,12 +1,15 @@
 <?php
 
-require_once('./config/dbconfig.php');
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
-// Enable CORS
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: GET, PUT, POST, DELETE, PATCH, OPTIONS");
+header("Access-Control-Allow-Origin: http://localhost:3000");
 header("Access-Control-Allow-Headers: Content-Type");
 header('Content-Type: application/json; charset=UTF-8');
+
+require_once('./config/dbconfig.php');
+
+$input = json_decode(file_get_contents('php://input'), true);
 
 // Handle incoming POST data
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

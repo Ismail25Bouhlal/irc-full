@@ -56,7 +56,7 @@ if (!$email || !$password) {
 
     // Check in the evaluateur table
 
-    $loginQueryEvaluateur = "SELECT email, password FROM evaluteur WHERE email = ?";
+    $loginQueryEvaluateur = "SELECT idevaluteur, email, password FROM evaluteur WHERE email = ?";
     $stmtEvaluateur = mysqli_prepare($conn, $loginQueryEvaluateur);
 
     if (!$stmtEvaluateur) {
@@ -72,7 +72,7 @@ if (!$email || !$password) {
     mysqli_stmt_store_result($stmtEvaluateur);
 
     if (mysqli_stmt_num_rows($stmtEvaluateur) > 0) {
-        mysqli_stmt_bind_result($stmtEvaluateur, $dbEmail, $dbPassword);
+        mysqli_stmt_bind_result($stmtEvaluateur,$idevaluteur , $dbEmail, $dbPassword);
         mysqli_stmt_fetch($stmtEvaluateur);
 
         if (password_verify($password, $dbPassword)) {
@@ -80,6 +80,8 @@ if (!$email || !$password) {
             $response['error'] = false;
             $response['role'] = "evaluateur";
             $response['email'] = $email;
+            $response['idevaluteur'] = $idevaluteur;
+            error_log("evaluateur ID: " . $idevaluteur );
             echo json_encode($response);
             exit();
         }
@@ -88,7 +90,8 @@ if (!$email || !$password) {
     mysqli_stmt_close($stmtEvaluateur);
 
     // Check in the chercheur table
-    $loginQueryChercheur = "SELECT email, password FROM chercheur WHERE email = ?";
+    // Modify this query to select idchercheur
+    $loginQueryChercheur = "SELECT idchercheur, email, password FROM chercheur WHERE email = ?";
     $stmtChercheur = mysqli_prepare($conn, $loginQueryChercheur);
 
     if (!$stmtChercheur) {
@@ -104,7 +107,7 @@ if (!$email || !$password) {
     mysqli_stmt_store_result($stmtChercheur);
 
     if (mysqli_stmt_num_rows($stmtChercheur) > 0) {
-        mysqli_stmt_bind_result($stmtChercheur, $dbEmail, $dbPassword);
+        mysqli_stmt_bind_result($stmtChercheur, $idchercheur, $dbEmail, $dbPassword);
         mysqli_stmt_fetch($stmtChercheur);
 
         // Verify password
@@ -113,6 +116,8 @@ if (!$email || !$password) {
             $response['error'] = false;
             $response['role'] = "chercheur";
             $response['email'] = $email;
+            $response['idchercheur'] = $idchercheur;
+            error_log("Chercheur ID: " . $idchercheur);
             echo json_encode($response);
             exit();
         }
