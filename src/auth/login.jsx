@@ -20,20 +20,35 @@ const Login = ({ onLogin }) => {
       });
 
       if (
-        response.data.role === "administrateur" ||
+        response.data.role === "evaluateur" ||
         response.data.role === "chercheur" ||
-        response.data.role === "evaluateur"
+        response.data.role === "administrateur"
       ) {
         Cookies.set("email", email, { expires: 30 });
 
-        // If the user is a chercheur or evaluateur, redirect to profile selection
+        if (response.data.idevaluteur) {
+          Cookies.set("idevaluateur", response.data.idevaluteur, {
+            expires: 30,
+            path: "/",
+          });
+        }
+        if (response.data.idchercheur) {
+          Cookies.set("idchercheur", response.data.idchercheur, {
+            expires: 30,
+            path: "/",
+          });
+        }
+
+        console.log("idchercheur","idevaluateur" , response.data.idchercheur , response.data.idevaluteur);
+
+        console.log("Login successful", response.data);
+
         if (
           response.data.role === "chercheur" ||
           response.data.role === "evaluateur"
         ) {
           navigate("/select-profile");
         } else {
-          // For admin, directly navigate to home
           navigate("/home");
           onLogin(response.data.role);
         }

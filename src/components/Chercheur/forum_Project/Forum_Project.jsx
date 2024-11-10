@@ -3,8 +3,9 @@ import axios from "axios";
 import { FaHome, FaFolder } from "react-icons/fa";
 import logo from "../../../assets/irc-logo-rb.png";
 import Cookies from "js-cookie";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import "./forum_Project.css";
+import Modal from "react-modal";
 
 const Forum_Project = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -17,19 +18,24 @@ const Forum_Project = () => {
   const [isDropdownOpen7, setIsDropdownOpen7] = useState(false);
 
   // State to store user information
-  const [userInfo, setUserInformation] = useState(null);
+  const [userInfo, setUserInformation] = useState("");
 
-  const [teams, setTeams] = useState([]);
-  const [newTeamName, setNewTeamName] = useState("");
-  const [newTeamLeader, setNewTeamLeader] = useState("");
   const [isFormVisible, setIsFormVisible] = useState(false);
+  const [newTeamName, setNewTeamName] = useState("");
+  const [selectedProjectId, setSelectedProjectId] = useState(null);
+  const [selectedResearcherId, setSelectedResearcherId] = useState(null);
+  const [newTeamLeader, setNewTeamLeader] = useState("");
+  const [newTeamLeaderEmail, setNewTeamLeaderEmail] = useState("");
+  const [teams, setTeams] = useState([]); // Initialize as an empty array
   const [expandedTeamIndex, setExpandedTeamIndex] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [resumeFr, setResumeFr] = useState("");
   const [resumeEn, setResumeEn] = useState("");
   const [taskFormVisible, setTaskFormVisible] = useState({});
   const [tasks, setTasks] = useState({});
   const [taskName, setTaskName] = useState("");
   const [taskDescription, setTaskDescription] = useState("");
+  const [members, setMembers] = useState([]);
   const [taskMember, setTaskMember] = useState("");
   const [taskStartDate, setTaskStartDate] = useState("");
   const [taskEndDate, setTaskEndDate] = useState("");
@@ -39,6 +45,11 @@ const Forum_Project = () => {
   const [methodology, setMethodology] = useState("");
   const [results, setResults] = useState("");
   const [ethics, setEthics] = useState("");
+  const [competitionId, setCompetitionId] = useState("");
+  const [competitionData, setCompetitionData] = useState(null);
+
+  const [teamId, setTeamId] = useState(null);
+  const [projectId, setProjectId] = useState(null);
 
   const [isFormVisiblePlaning, setIsFormVisiblePlaning] = useState(false);
   const [activity, setActivity] = useState("");
@@ -60,16 +71,105 @@ const Forum_Project = () => {
     totalAmount: "",
     requestedAmount: "",
   });
+  const [data, setData] = useState([]); // Store dropdown data
+  const [filteredGroupements, setFilteredGroupements] = useState([]);
+  const [filteredCategories, setFilteredCategories] = useState([]);
+  const [filteredSections, setFilteredSections] = useState([]);
+  const [idcompetition, setIdCompetition] = useState(null);
+  const [researcherId, setResearcherId] = useState(null);
 
-  const handleDomainChange = (e) => {
-    setSelectedDomain(e.target.value);
-    setFormData({ ...formData, domain: e.target.value });
+  const location = useLocation(); // Get current location to retrieve query params
+  const budgetParametreId = location.state?.budgetParametreId || null;
+  console.log("Received budgetParametreId:", budgetParametreId);
+
+  // Extract competitionId from query params
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const competitionIdFromUrl = searchParams.get("competitionId");
+
+    if (competitionIdFromUrl) {
+      setIdCompetition(competitionIdFromUrl); // Set competitionId in state
+    }
+  }, [location]);
+
+  useEffect(() => {
+    fetch("http://localhost/irc/fetch_dropdown_data.php")
+      .then((response) => response.json())
+      .then((fetchedData) => {
+        console.log("Fetched Data:", fetchedData); // Check fetched data
+        setData(fetchedData); // Store data in state
+      })
+      .catch((error) => console.error("Error fetching dropdown data:", error));
+  }, []);
+
+  useEffect(() => {
+    if (budgetParametreId && data.length > 0) {
+      filterDataByBudgetParametre(budgetParametreId, data);
+    }
+  }, [budgetParametreId, data]);
+
+  const filterDataByBudgetParametre = (budgetParametreId, data) => {
+    if (!budgetParametreId) {
+      console.warn("No budgetParametreId provided!");
+      return;
+    }
+
+    console.log("Filtering with budgetParametreId:", budgetParametreId);
+
+    // Filter data based on the budgetParametreId
+    const filteredData = data.filter(
+      (item) =>
+        parseInt(item.budget_parametre_id) === parseInt(budgetParametreId)
+    );
+
+    // Initialize unique collections for sections, groupements, and categories
+    const uniqueSections = [];
+    const uniqueGroupements = [];
+    const uniqueCategories = [];
+
+    const sectionMap = new Map();
+    const groupementMap = new Map();
+
+    filteredData.forEach((item) => {
+      // Check and add unique sections
+      if (!sectionMap.has(item.section_id)) {
+        sectionMap.set(item.section_id, {
+          section_id: item.section_id,
+          section_appellation: item.section_appellation,
+        });
+        uniqueSections.push(sectionMap.get(item.section_id));
+      }
+
+      // Check and add unique groupements under each section
+      if (!groupementMap.has(item.groupement_id)) {
+        groupementMap.set(item.groupement_id, {
+          groupement_id: item.groupement_id,
+          groupement_appellation: item.groupement_appellation,
+          groupement_section_id: item.groupement_section_id,
+        });
+        uniqueGroupements.push(groupementMap.get(item.groupement_id));
+      }
+
+      // Add all unique categories
+      uniqueCategories.push({
+        categorie_id: item.categorie_id,
+        categorie_appellation: item.categorie_appellation,
+        categorie_groupement_id: item.categorie_groupement_id,
+      });
+    });
+
+    // Set filtered results to state or display
+    setFilteredSections(uniqueSections);
+    setFilteredGroupements(uniqueGroupements);
+    setFilteredCategories(uniqueCategories);
   };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
+  // Log to check if competition ID is correctly retrieved
+  useEffect(() => {
+    if (idcompetition) {
+      console.log("Competition ID:", idcompetition);
+    }
+  }, [idcompetition]);
 
   const biologyOptions = [
     "Fonctionnement normal",
@@ -119,6 +219,16 @@ const Forum_Project = () => {
     "Application de modeles",
     "Ressources et infrastructures liees aux modeles scientifiques",
   ];
+
+  const handleDomainChange = (e) => {
+    setSelectedDomain(e.target.value);
+    setFormData({ ...formData, domain: e.target.value });
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
 
   const handleSavePlaning = () => {
     const newPlaning = {
@@ -245,8 +355,8 @@ const Forum_Project = () => {
     setSidebarOpen(!isSidebarOpen);
   };
 
-  const handleSave = () => {
-    // Directly access state variables instead of `formData`
+  const saveProjectData = async () => {
+    // Prepare the data structure to match what the backend expects
     const dataToSend = {
       projectTitle: formData.projectTitle,
       startDate: formData.startDate,
@@ -256,14 +366,10 @@ const Forum_Project = () => {
       subDomain: formData.subDomain,
       totalAmount: formData.totalAmount,
       requestedAmount: formData.requestedAmount,
-
-      // Resume information
       resume: {
         francais: resumeFr,
         anglais: resumeEn,
       },
-
-      // Mini project details
       miniProject: {
         introduction: intro,
         objectives: objectives,
@@ -273,16 +379,46 @@ const Forum_Project = () => {
       },
     };
 
-    // Send the data using axios
-    axios
-      .post("http://localhost/irc/projets.php", dataToSend)
-      .then((response) => {
-        console.log("Data saved successfully", response.data);
-      })
-      .catch((error) => {
-        console.error("There was an error saving the data!", error);
-      });
+    try {
+      const response = await axios.post(
+        "http://localhost/irc/projets.php",
+        dataToSend
+      );
+      console.log("Project data saved successfully:", response.data);
+      alert("Project data saved successfully!");
+    } catch (error) {
+      console.error("Error saving project data:", error);
+      alert("There was an error saving the project data!");
+    }
   };
+
+  const savePlanningData = async () => {
+    const planningData = {
+      nom_Planning: activity,
+      Description_Planning: description,
+      id_equipe: teamId,
+      idprojet: projectId,
+      debut_planning: startDate,
+      fin_planning: endDate,
+      nbr_jour_planning: totalDays,
+    };
+
+    try {
+      const response = await axios.post(
+        "http://localhost/irc/save_planning.php",
+        planningData
+      );
+      console.log("Planning data saved successfully:", response.data);
+      alert("Planning data saved successfully!");
+    } catch (error) {
+      console.error("Error saving planning data:", error);
+      alert("There was an error saving the planning data!");
+    }
+  };
+
+  // Handle changes in member details
+
+  // Remove a member
   const email = Cookies.get("email");
 
   useEffect(() => {
@@ -318,43 +454,26 @@ const Forum_Project = () => {
   }, [email]);
   console.log("userInfo:", userInfo);
 
-  const handleAddTeam = () => {
-    setTeams([
-      ...teams,
-      { name: newTeamName, leader: newTeamLeader, members: [] },
-    ]);
-    setNewTeamName("");
-    setNewTeamLeader("");
-    setIsFormVisible(false);
-  };
+  useEffect(() => {
+    // Fetch competition data
+    axios
+      .get("http://localhost/irc/getCompititionInfo.php")
+      .then((response) => {
+        const competitions = response.data;
+        if (competitions && competitions.length > 0) {
+          // Assuming you want to use the first competition in the list
+          const firstCompetition = competitions[0];
+          setCompetitionId(firstCompetition.id);
+          setCompetitionData(firstCompetition);
+          setSelectedProjectId(firstCompetition.id);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching competition data:", error);
+      });
+  }, [competitionId]);
+  console.log("compititionid:", competitionId);
 
-  const handleAddTeamMember = (index) => {
-    const memberName = prompt("Enter member's name:");
-    const memberRole = prompt("Enter member's role:");
-    if (memberName && memberRole) {
-      const updatedTeams = teams.map((team, i) =>
-        i === index
-          ? {
-              ...team,
-              members: [
-                ...team.members,
-                { name: memberName, role: memberRole },
-              ],
-            }
-          : team
-      );
-      setTeams(updatedTeams);
-    }
-  };
-
-  const handleDeleteTeamMember = (teamIndex, memberIndex) => {
-    const updatedTeams = teams.map((team, i) =>
-      i === teamIndex
-        ? { ...team, members: team.members.filter((_, j) => j !== memberIndex) }
-        : team
-    );
-    setTeams(updatedTeams);
-  };
 
   const getTrueDomainsOfInterest = () => {
     if (!userInfo) {
@@ -363,7 +482,6 @@ const Forum_Project = () => {
 
     let domainesDinteret = userInfo.domaine_dinteret;
 
-    // Parse `domaine_dinteret` if it's a string
     if (typeof domainesDinteret === "string") {
       try {
         domainesDinteret = JSON.parse(domainesDinteret);
@@ -390,10 +508,6 @@ const Forum_Project = () => {
     return trueChoices || "No true domain found";
   };
 
-  const toggleTeamMembers = (index) => {
-    setExpandedTeamIndex(expandedTeamIndex === index ? null : index);
-  };
-
   const handleAddTask = (index) => {
     setTaskFormVisible({
       ...taskFormVisible,
@@ -412,6 +526,7 @@ const Forum_Project = () => {
   const handleEditTask = (planingIndex, taskIndex) => {
     // Implement edit task functionality here
   };
+
 
   const handleDeleteTask = (planingIndex, taskIndex) => {
     const newTasks = { ...tasks };
@@ -451,12 +566,10 @@ const Forum_Project = () => {
             ID: {userInfo ? userInfo.email : "Loading..."}
           </div>
           <div className="save-button">
-            <button onClick={handleSave}>Enregistrer</button>
+            <button>Enregistrer</button>
           </div>
         </div>
-
         {/* Coordonnateur principal Dropdown */}
-
         <div className="dropdown">
           <div className="dropdown-title-wrapper" onClick={toggleDropdown1}>
             <div className="dropdown-title">Coordonnateur principal</div>
@@ -467,7 +580,7 @@ const Forum_Project = () => {
               <>
                 <p>
                   {" "}
-                  <strong> Appel à Compétition</strong>
+                  <h1 style={{ color: "black" }}>Appel A Compitition</h1>
                 </p>
                 <p className="item">
                   <strong>Nom</strong>
@@ -578,7 +691,6 @@ const Forum_Project = () => {
                   readOnly
                 />
                 <div className="dropdown-buttons">
-                  <button onClick={handleSave}>Enregistrer</button>
                   <button onClick={closeDropdown1}>Annuler</button>
                 </div>
               </>
@@ -587,7 +699,6 @@ const Forum_Project = () => {
             )}
           </div>
         </div>
-
         {/* Secondaire Dropdown */}
         <div className="dropdown">
           <div className="dropdown-title-wrapper" onClick={toggleDropdown2}>
@@ -597,6 +708,7 @@ const Forum_Project = () => {
           <div className={`dropdown-content ${isDropdownOpen2 ? "show" : ""}`}>
             {userInfo ? (
               <>
+                <h1 style={{ color: "black" }}>Informations générales</h1>
                 <p className="item">
                   <strong>Titre du projet</strong>
                 </p>
@@ -788,7 +900,7 @@ const Forum_Project = () => {
                   onChange={handleChange}
                 />
                 <div className="dropdown-buttons">
-                  <button onClick={handleSave}>Enregistrer</button>
+                  <button onClick={saveProjectData}>Enregistrer</button>
                   <button onClick={closeDropdown2}>Annuler</button>
                 </div>
               </>
@@ -797,7 +909,6 @@ const Forum_Project = () => {
             )}
           </div>
         </div>
-
         <div className="dropdown">
           <div className="dropdown-title-wrapper" onClick={toggleDropdown3}>
             <div className="dropdown-title">Résumé</div>
@@ -806,24 +917,24 @@ const Forum_Project = () => {
           <div className={`dropdown-content ${isDropdownOpen3 ? "show" : ""}`}>
             <>
               <h1 style={{ color: "black" }}>Résumé</h1>
-              <p>
+              <p className="text-left">
                 <strong>
                   Décrire : <br />
-                  -L'état de l’art du projet,
+                  -L'état de l'art du projet,
                   <br /> -Les Objectifs,
                   <br />
                   -La méthodologie, <br /> -Les Résultats.
                 </strong>
               </p>
-              <p>
+              <p className="text-left">
                 N.B : Si le projet est sélectionné et financé, son résumé
                 pourrait faire l'objet de publication sur le site internet de
                 l'IRC.
               </p>
               <div className="container-resume">
-                <p>
+                <p className="text-left">
                   Résumé en <strong> francais </strong> décrivant : L'état de
-                  l’art du projet, Les objectifs, La méthodologie, Les résultats
+                  l'art du projet, Les objectifs, La méthodologie, Les résultats
                   escomptés
                 </p>
                 <textarea
@@ -832,9 +943,9 @@ const Forum_Project = () => {
                 ></textarea>
               </div>
               <div className="container-resume">
-                <p>
+                <p className="text-left">
                   Résumé en <strong> Anglais </strong> décrivant : L'état de
-                  l’art du projet, Les objectifs, La méthodologie, Les résultats
+                  l'art du projet, Les objectifs, La méthodologie, Les résultats
                   escomptés
                 </p>
                 <textarea
@@ -843,14 +954,13 @@ const Forum_Project = () => {
                 ></textarea>
               </div>
               <div className="dropdown-buttons">
-                <button onClick={handleSave}>Enregistrer</button>
+                <button onClick={saveProjectData}>Enregistrer</button>
                 <button onClick={closeDropdown3}>Annuler</button>
               </div>
             </>
           </div>
         </div>
         <div className="dropdown">
-          {" "}
           <div className="dropdown-title-wrapper" onClick={toggleDropdown4}>
             <div className="dropdown-title">Description du mini-projet</div>
             <div className="dropdown-flesh">&#x25B6;</div>
@@ -859,55 +969,62 @@ const Forum_Project = () => {
             <>
               <h1 style={{ color: "black" }}>Description du mini-projet</h1>
               <div className="container-resume-mini">
-                <p>Introduction*</p>
+                <p className="text-left">Introduction*</p>
                 <textarea
                   value={intro}
                   onChange={(e) => setIntro(e.target.value)}
                 ></textarea>
               </div>
               <div className="container-resume-mini">
-                <p>Objectif général et objectifs spécifiques du projet *</p>
+                <p className="text-left">
+                  Objectif général et objectifs spécifiques du projet *
+                </p>
                 <textarea
                   value={objectives}
                   onChange={(e) => setObjectives(e.target.value)}
                 ></textarea>
               </div>
               <div className="container-resume-mini">
-                <p>Méthodologie proposée*</p>
+                <p className="text-left">Méthodologie proposée*</p>
                 <textarea
                   value={methodology}
                   onChange={(e) => setMethodology(e.target.value)}
                 ></textarea>
               </div>
               <div className="container-resume-mini">
-                <p>Résultats attendus et impacts du mini-projet*</p>
+                <p className="text-left">
+                  Résultats attendus et impacts du mini-projet*
+                </p>
                 <textarea
                   value={results}
                   onChange={(e) => setResults(e.target.value)}
                 ></textarea>
               </div>
               <div className="container-resume-mini">
-                <p>Considérations éthiques*</p>
+                <p className="text-left">Considérations éthiques*</p>
                 <textarea
                   value={ethics}
                   onChange={(e) => setEthics(e.target.value)}
                 ></textarea>
               </div>
               <div className="dropdown-buttons">
-                <button onClick={handleSave}>Enregistrer</button>
+                <button onClick={saveProjectData}>Enregistrer</button>
                 <button onClick={closeDropdown4}>Annuler</button>
               </div>
             </>
           </div>
         </div>
-
         <div className="dropdown">
-          <div className="dropdown-title-wrapper" onClick={toggleDropdown5}>
+          <div
+            className="dropdown-title-wrapper"
+            onClick={() => setIsFormVisible(!isFormVisible)}
+          >
             <div className="dropdown-title">Créer votre équipe</div>
             <div className="dropdown-flesh">&#x25B6;</div>
           </div>
-          <div className={`dropdown-content ${isDropdownOpen5 ? "show" : ""}`}>
+          <div className={`dropdown-content ${isFormVisible ? "show" : ""}`}>
             <>
+              <h1 style={{ color: "black" }}>Equipe</h1>
               <div className="equipe-section">
                 <button onClick={() => setIsFormVisible(!isFormVisible)}>
                   {isFormVisible ? "X" : "Ajouter Équipe"}
@@ -932,91 +1049,94 @@ const Forum_Project = () => {
                       </p>
                       <input
                         type="text"
-                        value={newTeamLeader}
-                        onChange={(e) => setNewTeamLeader(e.target.value)}
+                        value={userInfo.prenom}
                         placeholder="Chef d'équipe"
+                        readOnly
                       />
                     </div>
-                    <button onClick={handleAddTeam}>Ajouter</button>
+                    <div>
+                      <p className="item">
+                        <strong>Email de chef d'équipe:</strong>
+                      </p>
+                      <input
+                        type="email"
+                        value={userInfo.email}
+                        placeholder="Email de chef d'équipe"
+                        readOnly
+                      />
+                    </div>
+                    <button>Ajouter Membre</button>
                   </div>
                 )}
 
                 <div>
                   <p>
-                    <strong>Équipes créées:</strong>
+                    <strong>Membres de l'équipe:</strong>
                   </p>
-                  {teams.length > 0 ? (
-                    <table>
-                      <thead>
-                        <tr>
-                          <th>Nom d'équipe</th>
-                          <th>Chef d'équipe</th>
-                          <th>Action</th>
-                          <th>Membres</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {teams.map((team, index) => (
-                          <React.Fragment key={index}>
-                            <tr>
-                              <td>{team.name}</td>
-                              <td>{team.leader}</td>
-                              <td>
-                                <button
-                                  onClick={() => toggleTeamMembers(index)}
-                                >
-                                  {expandedTeamIndex === index
-                                    ? "Cacher Membres"
-                                    : "Voir Membres"}
-                                </button>
-                                <button
-                                  onClick={() => handleAddTeamMember(index)}
-                                >
-                                  Ajouter Membre
-                                </button>
-                              </td>
-                              <td>
-                                {expandedTeamIndex === index && (
-                                  <div className="team-members-dropdown">
-                                    {team.members.length > 0 ? (
-                                      <ul>
-                                        {team.members.map((member, i) => (
-                                          <li key={i}>
-                                            {member.name} ({member.role})
-                                            <button
-                                              onClick={() =>
-                                                handleDeleteTeamMember(index, i)
-                                              }
-                                            >
-                                              Supprimer
-                                            </button>
-                                          </li>
-                                        ))}
-                                      </ul>
-                                    ) : (
-                                      <p>Aucun membre ajouté.</p>
-                                    )}
-                                  </div>
-                                )}
-                              </td>
-                            </tr>
-                          </React.Fragment>
-                        ))}
-                      </tbody>
-                    </table>
-                  ) : (
-                    <p className="no-teams">Aucune équipe ajoutée.</p>
-                  )}
+                  {members.map((member, index) => (
+                    <div key={index} className="member-form">
+                      <div>
+                        <p>Nom membre:</p>
+                        <input
+                          type="text"
+                          value={member.nom}
+                          placeholder="Nom membre"
+                        />
+                      </div>
+                      <div>
+                        <p>Prénom membre:</p>
+                        <input
+                          type="text"
+                          value={member.prenom}
+                          placeholder="Prénom membre"
+                        />
+                      </div>
+                      <button>
+                        Retirer
+                      </button>
+                    </div>
+                  ))}
                 </div>
-              </div>
-              <div className="dropdown-buttons">
-                <button onClick={handleSave}>Enregistrer</button>
-                <button onClick={closeDropdown5}>Annuler</button>
+
+                {/* Display Data in Table */}
+                <h3>Équipe Détails</h3>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Nom d'équipe</th>
+                      <th>Chef d'équipe</th>
+                      <th>Email du chef</th>
+                      <th>Membres</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>{newTeamName}</td>
+                      <td>{userInfo.prenom}</td>
+                      <td>{userInfo.email}</td>
+                      <td>
+                        <ul>
+                          {members.map((member, index) => (
+                            <li key={index}>
+                              {member.nom} {member.prenom}
+                            </li>
+                          ))}
+                        </ul>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <div className="dropdown-buttons">
+                  <button>Enregistrer</button>
+                  <button onClick={() => setIsFormVisible(false)}>
+                    Annuler
+                  </button>
+                </div>
               </div>
             </>
           </div>
         </div>
-
         <div className="dropdown">
           <div className="dropdown-title-wrapper" onClick={toggleDropdown6}>
             <div className="dropdown-title">Planing</div>
@@ -1024,7 +1144,7 @@ const Forum_Project = () => {
           </div>
           <div className={`dropdown-content ${isDropdownOpen6 ? "show" : ""}`}>
             <>
-              <p>Ajouter un Planing</p>
+              <h1 style={{ color: "black" }}>Planing</h1>
               <button
                 onClick={() => setIsFormVisiblePlaning(!isFormVisiblePlaning)}
               >
@@ -1313,58 +1433,106 @@ const Forum_Project = () => {
             <div className="dropdown-flesh">&#x25B6;</div>
           </div>
           <div className={`dropdown-content ${isDropdownOpen7 ? "show" : ""}`}>
-            {" "}
-            <p>
-              Décrivez les dépenses pour chacune des catégories budgétaires
-              pertinentes.
-            </p>
+            <h1 style={{ color: "black" }}>Budget</h1>
             <p className="item">
               <strong>Type de section</strong>
             </p>
             <select className="select-feild">
-              <option value="">choisire votre Type de section</option>
-              <option value="">Depenses de fonctionnement</option>
+              <option value="">Choisir votre Type de section</option>
+              {filteredSections.length > 0 ? (
+                filteredSections.map((section) => (
+                  <option key={section.section_id} value={section.section_id}>
+                    {section.section_appellation}
+                  </option>
+                ))
+              ) : (
+                <option disabled>Aucune section disponible</option>
+              )}
             </select>
+
             <p className="item">
               <strong>Groupement Budget</strong>
             </p>
-            <select className="select-feild">
-              <option value="">choisir votre Groupement Budget</option>
-              <option value="">Depenses de fonctionnement</option>
+            <select
+              className="select-feild"
+              disabled={!filteredGroupements.length}
+            >
+              <option value="">Choisir votre Groupement Budget</option>
+              {filteredGroupements.map((groupement) => (
+                <option
+                  key={groupement.groupement_id}
+                  value={groupement.groupement_id}
+                >
+                  {groupement.groupement_appellation}
+                </option>
+              ))}
             </select>
+
             <p className="item">
               <strong>Catégorie</strong>
             </p>
-            <select className="select-feild">
-              <option value="">choisir la Catégorie</option>
-              <option value="">Depenses de fonctionnement</option>
+            <select
+              className="select-feild"
+              disabled={!filteredCategories.length}
+            >
+              <option value="">Choisir la Catégorie</option>
+              {filteredCategories.map((categorie) => (
+                <option
+                  key={categorie.categorie_id}
+                  value={categorie.categorie_id}
+                >
+                  {categorie.categorie_appellation}
+                </option>
+              ))}
             </select>
-            <div className="task-form-group">
-              <p className="item">
-                <strong>Description:</strong>
-              </p>
-              <input
-                type="text"
-                placeholder="Description"
-                onChange={(e) => setTaskDescription(e.target.value)}
-              />
-            </div>
+
             <p className="item">
-              <strong>Montant de budegt</strong>
+              <strong>Description</strong>
             </p>
-            <input
-              type="number"
-              placeholder="Montant de budegt"
-              name="totalAmount"
-              value={formData.totalAmount}
-              onChange={handleChange}
-            />
+            <input type="text" placeholder="Description" />
+            <p className="item">
+              <strong>Montant Du Budget</strong>
+            </p>
+            <input type="Number" placeholder="Montant Du Budget" />
             <div className="dropdown-buttons">
-              <button onClick={handleSave}>Enregistrer</button>
+              <button onClick={handleSavePlaning}>Enregistrer</button>
               <button onClick={closeDropdown7}>Annuler</button>
             </div>
           </div>
         </div>
+        {/* Modal for displaying team members */}
+        <Modal
+          isOpen={isModalOpen}
+          onRequestClose={() => setIsModalOpen(false)}
+          contentLabel="Team Members"
+        >
+          <button
+            className="close-button"
+            onClick={() => setIsModalOpen(false)}
+          >
+            &times;
+          </button>
+          <h4>Membres de l'équipe</h4>
+          {expandedTeamIndex !== null &&
+          teams[expandedTeamIndex].members.length > 0 ? (
+            <ul className="team-members-list">
+              {teams[expandedTeamIndex].members.map((member, i) => (
+                <li key={i} className="team-member-item">
+                  <span>
+                    {member.name} ({member.role})
+                  </span>
+                  <button
+                    className="delete-member-button"
+                  >
+                    Supprimer
+                  </button>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>Aucun membre ajouté.</p>
+          )}
+        </Modal>
       </div>
     </div>
   );

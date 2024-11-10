@@ -219,7 +219,7 @@
   border-radius: 10px;
   max-width: 1200px;
   margin: 0 auto;
-  background-color: #E4D2D2;
+  background-color: #e4d2d2;
 }
 
 .equipe-section button {
@@ -359,4 +359,193 @@ td {
 .planing-dropdown-buttons button {
   padding: 10px 20px;
   cursor: pointer;
+}
+
+.button-container {
+  display: inline-flex;
+  gap: 5px; /* Reduce the space between the buttons */
+}
+
+.button-container .button {
+  flex: none; /* Ensure buttons do not take equal space */
+  width: auto; /* Allow buttons to take their natural width */
+  padding: 8px 12px; /* Adjust padding as needed */
+}
+
+.text-left {
+  text-align: left;
+}
+.team-members-section {
+  background-color: #f9f9f9;
+  padding: 15px;
+  border-radius: 5px;
+  margin-top: 10px;
+  margin-bottom: 20px; /* Add this to create space between sections */
+  width: 100%; /* Ensure it stretches the full width */
+}
+
+.team-members-section h4 {
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.team-members-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.team-member-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #ddd;
+  color: #000; /* Text color in black */
+}
+
+.team-member-item:last-child {
+  border-bottom: none;
+}
+
+.delete-member-button {
+  background-color: #ff4d4d;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.delete-member-button:hover {
+  background-color: #ff1a1a;
+}
+
+/* Modal specific styles */
+/* Overlay Styling */
+.ReactModal__Overlay {
+  background-color: transparent !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 30rem;
+  padding: 40px; /* Prevent modal from sticking to screen edges */
+}
+
+/* Modal Content Styling */
+.ReactModal__Content {
+  position: relative;
+  padding: 30px; /* Increase padding for better spacing */
+  border-radius: 12px; /* Slightly larger border radius for a softer look */
+  max-width: 600px;
+  width: 100%;
+  background-color: #fff;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15); /* Softer shadow */
+  color: #333;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 15px; /* Gap between child elements */
+  align-items: center; /* Center content horizontally */
+}
+
+/* Close Button Styling (Top-Right X Button) */
+.close-button {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #888;
+  transition: color 0.2s ease;
+}
+
+.close-button:hover {
+  color: #555;
+}
+
+/* Heading Styling */
+.ReactModal__Content h4 {
+  margin: 0 0 20px 0; /* Remove top margin */
+  font-size: 1.5rem; /* Slightly larger font size */
+  color: #333;
+  text-align: center; /* Center the heading */
+  width: 100%; /* Make sure heading occupies full width */
+}
+
+/* Team Members List Styling */
+.team-members-list {
+  list-style: none; /* Remove bullets */
+  padding: 0;
+  margin: 0;
+  width: 90%; /* Make list take up full modal width */
+}
+
+/* Each Member Item Styling */
+.team-member-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 0; /* Spacing between items */
+  border-bottom: 1px solid #ddd; /* Separator line */
+  width: 100%; /* Make items take up full width */
+}
+
+.team-member-item span {
+  font-size: 1rem;
+  color: #333;
+}
+
+/* Delete Member Button Styling */
+.delete-member-button {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2); /* Subtle shadow */
+}
+
+.delete-member-button:hover {
+  background-color: #0069d9;
+  box-shadow: 0 6px 12px rgba(0, 105, 217, 0.25);
+}
+
+/* No Members Text */
+.ReactModal__Content p {
+  color: #555; /* Softer text color */
+  margin: 0;
+  text-align: center;
+  font-size: 1rem;
+}
+
+/* Modal Footer Styling */
+.modal-footer {
+  margin-top: 20px; /* Space between content and close button */
+  display: flex;
+  justify-content: center; /* Center the close button */
+  width: 100%;
+}
+
+/* Close Modal Button Styling */
+.close-modal-btn {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
+}
+
+.close-modal-btn:hover {
+  background-color: #0069d9;
 }

@@ -1,29 +1,26 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import "bootstrap/dist/css/bootstrap.min.css"; // Import Bootstrap CSS
 import { Container } from "react-bootstrap";
 import { MdModeEditOutline, MdDeleteForever } from "react-icons/md";
 import { Link } from "react-router-dom";
 import { FaHome, FaFolder } from "react-icons/fa";
 import { FiUsers } from "react-icons/fi";
-import "./projet.css";
 import { FaUserPen } from "react-icons/fa6";
+import "./projet.css";
 import logo from "../../../assets/irc-logo-rb.png";
 
 function Project() {
   const [competitions, setCompetitions] = useState([]);
-  const [selectedCompetition, setSelectedCompetition] = useState({
-    titre: "Sample Title",
-    liblle: "Sample Description",
-  });
   const [selectedItem, setSelectedItem] = useState("competition");
 
-  const handleItemClick = (item) => {
-    setSelectedItem(item);
+  const navigate = useNavigate();
+
+  const handleEditClick = (competition) => {
+    navigate("/ModifierComp", { state: { selectedCompetition: competition } });
   };
 
   useEffect(() => {
-    // Fetch competition data when component mounts
     const fetchCompetitions = async () => {
       try {
         const response = await axios.get(
@@ -36,10 +33,7 @@ function Project() {
     };
 
     fetchCompetitions();
-  }, []); // Empty dependency array ensures this effect runs only once on component mount
-  const handleCompetitionClick = (competition) => {
-    setSelectedCompetition(JSON.stringify(competition));
-  };
+  }, []);
 
   return (
     <div className="d-flex">
@@ -48,7 +42,7 @@ function Project() {
           <img src={logo} alt="IRC Logo" className="logo" />
         </div>
         <Link to="/home" style={{ textDecoration: "none" }}>
-          <div className="sidebar-item" onClick={() => handleItemClick(null)}>
+          <div className="sidebar-item">
             <FaHome style={{ marginRight: "8px" }} />
             Home
           </div>
@@ -57,7 +51,7 @@ function Project() {
           className={`sidebar-item ${
             selectedItem === "competition" ? "active" : ""
           }`}
-          onClick={() => handleItemClick("competition")}
+          // onClick={() => handleItemClick("competition")}
         >
           <FaFolder style={{ marginRight: "8px" }} />
           Competition
@@ -69,22 +63,19 @@ function Project() {
           </div>
         </Link>
         <Link to={"/Evaluateur"}>
-        <div className="sidebar-item">
-          <FaUserPen style={{ marginRight: "8px" }} />
-          Evaluateur
-        </div>
+          <div className="sidebar-item">
+            <FaUserPen style={{ marginRight: "8px" }} />
+            Evaluateur
+          </div>
         </Link>
       </div>
       {selectedItem === "competition" && (
         <Container
           className="content"
-          style={{ marginTop: "5rem", marginLeft: "30%" }} // Remove border radius
+          style={{ marginTop: "1rem", marginLeft: "23%" }}
         >
           <div>
-            <h1 style={{ marginRight: "-60%", color: "black" }}>
-              COMPETITION
-            </h1>
-            {/* Add shadow to table */}
+            <h1 style={{ marginRight: "-40%", color: "black" }}>COMPETITION</h1>
             <Link to={"/AjouteruneComp"}>
               <button
                 className="btn btn-success mb-3"
@@ -97,7 +88,7 @@ function Project() {
               className="table table-bordered table-hover"
               style={{ width: "150%" }}
             >
-              <thead className="">
+              <thead>
                 <tr>
                   <th scope="col">#</th>
                   <th scope="col">Titre</th>
@@ -113,10 +104,7 @@ function Project() {
               </thead>
               <tbody>
                 {competitions.map((competition, index) => (
-                  <tr
-                    key={index}
-                    onClick={() => handleCompetitionClick(competition)}
-                  >
+                  <tr key={index}>
                     <th scope="row">{index + 1}</th>
                     <td>{competition.titre}</td>
                     <td>{competition.libelle}</td>
@@ -125,16 +113,8 @@ function Project() {
                     <td>{competition.enligne === "1" ? "Oui" : "Non"}</td>
                     <td>{competition.annee_competition}</td>
                     <td className="text-center">
-                      <Link
-                        to={{
-                          pathname: "/ModifierComp",
-                          state: {
-                            selectedCompetition:
-                              JSON.stringify(selectedCompetition),
-                          },
-                        }}
-                      >
                         <button
+                        onClick={() => handleEditClick(competition)}
                           style={{
                             backgroundColor: "#007bff",
                             color: "#fff",
@@ -145,7 +125,7 @@ function Project() {
                         >
                           <MdModeEditOutline />
                         </button>
-                      </Link>
+
                       <button
                         style={{
                           backgroundColor: "#dc3545",

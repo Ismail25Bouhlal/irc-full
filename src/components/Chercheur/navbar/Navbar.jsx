@@ -88,10 +88,10 @@ const Navbar = () => {
                     </div>
                     <Link to="/chercheur-projet" className="hex-content">
                       <span className="hex-content-inner">
+                        <span className="title">Compétitions</span>
                         <i>
                           <AiFillFolderOpen className="ic" />
                         </i>
-                        <span className="title">Compétitions</span>
                       </span>
                       <svg
                         viewBox="0 0 173.20508075688772 200"

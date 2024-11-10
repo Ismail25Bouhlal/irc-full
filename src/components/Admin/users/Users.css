@@ -5,7 +5,7 @@
   align-items: center;
   height: 100vh; /* Full viewport height */
   width: calc(100% - 750px); /* Adjust width considering the sidebar width */
-  margin-left: 650px; /* Adjust for the sidebar */
+  margin-left: 635px; /* Adjust for the sidebar */
 }
 
 .main-content {

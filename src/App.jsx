@@ -13,7 +13,6 @@ import Comptechercheur from "./components/Chercheur/compte/compte.jsx";
 import AjouterUnecomp from "./components/Admin/projet/AjouterUneComp.jsx";
 import Modification from "./components/Admin/projet/Modification.jsx";
 import Forum_projectcherecheur from "./components/Chercheur/forum_Project/Forum_Project.jsx";
-import forum_project from "./components/Admin/forum_Project/forum_project.jsx";
 import Users from "./components/Admin/users/Users.jsx";
 import Comite from "./components/Admin/comite/Comite.jsx";
 import Parametre from "./components/Admin/parametre/parametre.jsx";
@@ -23,6 +22,7 @@ import Evaluteur from "./components/Admin/evaluteur/evaluteur.jsx";
 import AjouterUnBudget from "./components/Admin/parametre/AjouterUnBudget.jsx";
 import HomeEvaluateur from "./components/Evaluateur/Home.jsx";
 import ProfileSelection from "./components/profileselect/ProfileSelection.jsx";
+import ModifierLeBudget from "./components/Admin/parametre/ModifierLeBudget.jsx";
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -72,6 +72,7 @@ const App = () => {
           <Route path="/UserEdit" element={<UserEdit />} />
           <Route path="/Evaluateur" element={<Evaluteur />} />
           <Route path="/AjouterUnBudget" element={<AjouterUnBudget />} />
+          <Route path="/ModifierLeBudget" element={<ModifierLeBudget/>} />
         </>
       )}
       {role === "chercheur" && (

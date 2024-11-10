@@ -557,46 +557,41 @@ label {
 }
 
 .hex-content {
-  color: #62a66c;
-  display: block;
-  height: 180px;
-  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
   position: relative;
   text-align: center;
   transform: rotate(-30deg);
-  width: 156px;
 }
-.hex-content .hex-content-inner {
-  left: 50%;
-  margin: -3px 0 0 2px;
-  position: absolute;
-  top: 50%;
-  -webkit-transform: translate(-50%, -50%);
-  -moz-transform: translate(-50%, -50%);
-  -ms-transform: translate(-50%, -50%);
-  -o-transform: translate(-50%, -50%);
-  transform: translate(-50%, -50%);
-}
-.hex-content .ic {
-  display: block;
-  font-size: 70px;
-  margin-top: -0.1rem;
-  margin-left: 0.5rem;
-  color: #ffffff;
+
+.hex-content-inner {
+  display: flex;
+  flex-direction: column-reverse; /* Place icon under the text */
   align-items: center;
-  text-align: center;
+  justify-content: center;
+  transform: rotate(30deg); /* Rotate back to normal */
 }
+
+.hex-content .ic {
+  font-size: 70px;
+  color: #ffffff;
+  margin: 0; /* Remove any margin */
+}
+
 .hex-content .title {
-  display: block;
   font-family: "Open Sans", sans-serif;
   font-size: 14px;
   letter-spacing: 1px;
   line-height: 24px;
-  margin-top: 4rem;
-  margin-left: 3px;
   text-transform: uppercase;
   color: #fff;
+  margin: 0; /* Remove any margin */
+  margin-bottom: 10px; /* Add some space between text and icon */
 }
+
 .hex-content svg {
   left: -7px;
   position: absolute;

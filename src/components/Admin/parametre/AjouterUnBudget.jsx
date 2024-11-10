@@ -4,6 +4,7 @@ import { FiUsers } from "react-icons/fi";
 import { FaUserPen } from "react-icons/fa6";
 import logo from "../../../assets/irc-logo-rb.png";
 import { Link } from "react-router-dom";
+import axios from "axios";
 import "./AjouterUnBudget.css";
 
 const AjouterUnBudget = () => {
@@ -152,8 +153,6 @@ const AjouterUnBudget = () => {
     setSections(updatedSections);
   };
 
-
-
   const handleDeleteGroup = (index) => {
     const updatedGroups = groups.filter((_, i) => i !== index);
     setGroups(updatedGroups);
@@ -178,6 +177,32 @@ const AjouterUnBudget = () => {
     setGroupAppelation(group.appelation);
     setGroupSection(group.groupement);
     setIsGroupFormOpen(true);
+  };
+
+  const handleSaveAll = () => {
+    // Gather all the data from the page
+    const budgetData = {
+      appelation, // Appelation for budget_parametre
+      creationDate, // Creation date for budget_parametre
+      sections, // All section data
+      groups, // All group data
+      categories, // All category data
+    };
+
+    // Log the data to verify it's correct before sending
+    console.log("Data to be saved:", budgetData);
+
+    // Send to server
+    axios
+      .post("http://localhost/irc/budget.php", budgetData)
+      .then((response) => {
+        console.log("Data saved successfully:", response.data);
+        alert("Data saved successfully!");
+      })
+      .catch((error) => {
+        console.error("Error saving data:", error);
+        alert("Failed to save data.");
+      });
   };
 
   const handleEditCategorie = (index) => {
@@ -243,7 +268,6 @@ const AjouterUnBudget = () => {
             />
           </div>
         </form>
-
         {/* First Table Section */}
         <div className="table-section">
           <div className="table-header">
@@ -278,44 +302,41 @@ const AjouterUnBudget = () => {
           </table>
 
           {isSectionFormOpen && (
-          <div className="modal">
-            <form className="modal-content section-form" onSubmit={handleSectionSubmit}>
-              <h2>
+            <form className="group-form" onSubmit={handleSectionSubmit}>
+              <h3>
                 {editingSectionIndex !== null
                   ? "Modifier Section"
                   : "Ajouter Section"}
-              </h2>
+              </h3>
               <div>
-                <label htmlFor="sectionAppelation" style={{ color: "black" }}>
-                  Appelation Section:
+                <label htmlFor="groupAppelation" style={{ color: "black" }}>
+                  Appelation Groupement:
                 </label>
                 <input
                   type="text"
                   id="sectionAppelation"
                   value={sectionAppelation}
                   onChange={handleSectionAppelationChange}
-                  placeholder="Enter section name"
+                  placeholder="Enter Section Nom"
                 />
               </div>
               <div>
-                <label htmlFor="sectionDate" style={{ color: "black" }}>
+                <label htmlFor="creationDate" style={{ color: "black" }}>
                   Date de Création:
                 </label>
                 <input
                   type="date"
-                  id="sectionDate"
-                  value={sectionDate}
+                  id="creationDate"
+                  value={new Date().toISOString().substring(0, 10)}
                   readOnly
                 />
               </div>
               <button type="submit">
-                {editingSectionIndex !== null ? "Modifier" : "Ajouter"}
+                {editingGroupIndex !== null ? "Modifier" : "Ajouter"}
               </button>
             </form>
-            </div>
           )}
         </div>
-
         {/* Second Table Groupement */}
         <div className="table-section">
           <div className="table-header">
@@ -404,7 +425,6 @@ const AjouterUnBudget = () => {
             </form>
           )}
         </div>
-
         {/* Third Table Categorie */}
         <div className="table-section">
           <div className="table-header">
@@ -441,7 +461,7 @@ const AjouterUnBudget = () => {
           </table>
 
           {isCategorieFormOpen && (
-            <form className="categorie-form" onSubmit={handleCategorieSubmit}>
+            <form className="group-form" onSubmit={handleCategorieSubmit}>
               <h3>
                 {editingCategorieIndex !== null
                   ? "Modifier Categorie"
@@ -493,6 +513,13 @@ const AjouterUnBudget = () => {
             </form>
           )}
         </div>
+        <button
+          type="submit"
+          className="enregistrer-button"
+          onClick={handleSaveAll}
+        >
+          Enregistrer
+        </button>
       </div>
     </div>
   );

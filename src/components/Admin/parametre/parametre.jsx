@@ -1,206 +1,172 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 import { FaHome, FaFolder } from "react-icons/fa";
 import { FiUsers } from "react-icons/fi";
 import { FaUserPen } from "react-icons/fa6";
 import logo from "../../../assets/irc-logo-rb.png";
 import "./parametre.css";
 
-const Parametre = () => {
-  const [budgets, setBudgets] = useState([
-    {
-      appellation: "Budget AAP2024",
-      dateCreation: "26/09/2024",
-      nbrLigneN1: 4,
-      nbrLigneN2: 4,
-      nbrLigneN3: 4,
-    },
-  ]);
+// Helper function to group data by budget appellation
+const groupBudgetData = (data) => {
+  const grouped = {};
 
-  const [isFormVisible, setIsFormVisible] = useState(false);
-  const [newBudget, setNewBudget] = useState({
-    appellation: "",
-    dateCreation: new Date().toLocaleDateString("en-GB"),
-  });
-  const [isEditing, setIsEditing] = useState(false);
-  const [editingIndex, setEditingIndex] = useState(null);
+  data.forEach((entry) => {
+    const {
+      budget_appellation,
+      budget_date_creation,
+      section,
+      groupement,
+      categorie,
+    } = entry;
 
-  const handleAddBudgetClick = () => {
-    setIsFormVisible(true);
-    setIsEditing(false);
-    setNewBudget({
-      appellation: "",
-      dateCreation: new Date().toLocaleDateString("en-GB"),
-    });
-  };
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setNewBudget((prevBudget) => ({
-      ...prevBudget,
-      [name]: value,
-    }));
-  };
-
-  const handleFormSubmit = (e) => {
-    e.preventDefault();
-    if (isEditing) {
-      const updatedBudgets = [...budgets];
-      updatedBudgets[editingIndex] = newBudget;
-      setBudgets(updatedBudgets);
-      setIsEditing(false);
-      setEditingIndex(null);
-    } else {
-      setBudgets([...budgets, newBudget]);
+    // Initialize the budget object if not already present
+    if (!grouped[budget_appellation]) {
+      grouped[budget_appellation] = {
+        budget_appellation,
+        budget_date_creation,
+        sections: new Set(), // Using Set to avoid duplicate sections
+        groupements: new Set(), // Using Set to avoid duplicate groupements
+        categories: new Set(), // Using Set to avoid duplicate categories
+      };
     }
-    setIsFormVisible(false);
-    setNewBudget({
-      appellation: "",
-      dateCreation: new Date().toLocaleDateString("en-GB"),
-    });
+
+    // Add unique sections, groupements, and categories
+    grouped[budget_appellation].sections.add(section);
+    grouped[budget_appellation].groupements.add(groupement);
+    if (categorie) grouped[budget_appellation].categories.add(categorie); // Handle null categories
+  });
+
+  // Convert Sets to counts and return as an array
+  return Object.values(grouped).map((budget) => ({
+    ...budget,
+    sectionCount: budget.sections.size,
+    groupementCount: budget.groupements.size,
+    categorieCount: budget.categories.size,
+  }));
+};
+
+const Parametre = () => {
+  const [budgetData, setBudgetData] = useState([]);
+  const navigate = useNavigate();
+
+  const handleEdit = (budget) => {
+    console.log("Selected Budget Data:", budget); // Debug to see the structure
+    navigate("/ModifierLeBudget", { state: { budget } }); // Ensure sections, groupements, and categories are arrays
   };
 
-  const handleDelete = (index) => {
-    setBudgets(budgets.filter((_, i) => i !== index));
+  // Fetch data from the backend
+  useEffect(() => {
+    axios
+      .get("http://localhost/irc/getBudgetData.php")
+      .then((response) => {
+        console.log("Raw Budget Data:", response.data); // Debug the raw data
+        const groupedData = groupBudgetData(response.data);
+        console.log("Grouped Budget Data:", groupedData); // Debug the grouped data
+        setBudgetData(groupedData);
+      })
+      .catch((error) => {
+        console.error("Error fetching budget data:", error);
+      });
+  }, []);
+
+  const handleDuplicate = (budget) => {
+    alert(`Dupliquer: ${budget.budget_appellation}`);
+    // Logic to duplicate the budget
   };
 
-  const handleDuplicate = (index) => {
-    const budgetToDuplicate = budgets[index];
-    const newBudget = {
-      ...budgetToDuplicate,
-      appellation: `${budgetToDuplicate.appellation} (dupliqué)`,
-    };
-    setBudgets([...budgets, newBudget]);
-  };
-
-  const handleEdit = (index) => {
-    setNewBudget(budgets[index]);
-    setIsFormVisible(true);
-    setIsEditing(true);
-    setEditingIndex(index);
+  const handleDelete = (budget) => {
+    if (
+      window.confirm(
+        `Voulez-vous vraiment supprimer ${budget.budget_appellation} ?`
+      )
+    ) {
+      alert(`Supprimé: ${budget.budget_appellation}`);
+      // Logic to delete the budget (e.g., API call to backend)
+    }
   };
 
   return (
     <div className="d-flex">
-      <div className="sidebar">
-        <>
-          <div className="logo-container">
-            <img src={logo} alt="IRC Logo" className="logo" />
-          </div>
-          <Link to="/home" style={{ textDecoration: "none" }}>
-            <div className="sidebar-item">
-              <FaHome style={{ marginRight: "8px" }} />
-              Home
-            </div>
-          </Link>
-          <Link to={"/admin-projet"}>
-            <div className="sidebar-item">
-              <FaFolder style={{ marginRight: "8px" }} />
-              Competition
-            </div>
-          </Link>
-          <div className="sidebar-item">
-            <FiUsers style={{ marginRight: "8px" }} />
-            Utilisateurs
-          </div>
-          <div className="sidebar-item">
-            <FaUserPen style={{ marginRight: "8px" }} />
-            Evaluation
-          </div>
-        </>
-      </div>
+      <Sidebar />
+
       <div className="content-param">
-        <h1>Liste des Budgets Crees</h1>
+        <h1>Liste des Budgets avec Sections, Groupements, et Catégories</h1>
+
         <Link to={"/AjouterUnBudget"}>
           <button className="add-budget-btn">+ Ajouter un Budget</button>
         </Link>
+
         <table className="budgets-table">
           <thead>
             <tr>
-              <th>Appellation</th>
-              <th>Date de creation</th>
-              <th>NBR Ligne N1</th>
-              <th>NBR Ligne N2</th>
-              <th>NBR Ligne N3</th>
-              <th>Actions</th>
+              <th>Appellation Budget</th>
+              <th>Date de Création</th>
+              <th>Nombre de Sections</th>
+              <th>Nombre de Groupements</th>
+              <th>Nombre de Catégories</th>
+              <th>Actions</th> {/* New Actions Column */}
             </tr>
           </thead>
           <tbody>
-            {budgets.map((budget, index) => (
+            {budgetData.map((budget, index) => (
               <tr key={index}>
-                <td>{budget.appellation}</td>
-                <td>{budget.dateCreation}</td>
-                <td>{budget.nbrLigneN1}</td>
-                <td>{budget.nbrLigneN2}</td>
-                <td>{budget.nbrLigneN3}</td>
+                <td>{budget.budget_appellation}</td>
+                <td>{budget.budget_date_creation}</td>
+                <td>{budget.sectionCount}</td>
+                <td>{budget.groupementCount}</td>
+                <td>{budget.categorieCount}</td>
                 <td>
                   <button
-                    className="modify-btn"
-                    onClick={() => handleEdit(index)}
+                    className="action-btn edit-btn"
+                    onClick={() => handleEdit(budget)}
                   >
-                    modifier
+                    Modifier
                   </button>
                   <button
-                    className="modify-btn"
-                    onClick={() => handleDuplicate(index)}
+                    className="action-btn duplicate-btn"
+                    onClick={() => handleDuplicate(budget)}
                   >
-                    dupliquer
+                    Dupliquer
                   </button>
                   <button
-                    className="modify-btn"
-                    onClick={() => handleDelete(index)}
+                    className="action-btn delete-btn"
+                    onClick={() => handleDelete(budget)}
                   >
-                    supprimer
+                    Supprimer
                   </button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
-        {isFormVisible && (
-          <div className="popup">
-            <div className="popup-inner">
-              <form onSubmit={handleFormSubmit} className="budget-form">
-                <h2>
-                  {isEditing ? "Modifier le Budget" : "Ajouter un Budget"}
-                </h2>
-                <label>
-                  Appellation:
-                  <input
-                    type="text"
-                    name="appellation"
-                    value={newBudget.appellation}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </label>
-                <label>
-                  Date de creation:
-                  <input
-                    type="text"
-                    name="dateCreation"
-                    value={newBudget.dateCreation}
-                    onChange={handleInputChange}
-                    readOnly
-                  />
-                </label>
-                <button type="submit" className="submit-btn">
-                  {isEditing ? "Modifier" : "Ajouter"}
-                </button>
-                <button
-                  type="button"
-                  className="cancel-btn"
-                  onClick={() => setIsFormVisible(false)}
-                >
-                  Annuler
-                </button>
-              </form>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
 };
+
+const Sidebar = () => (
+  <div className="sidebar">
+    <div className="logo-container">
+      <img src={logo} alt="IRC Logo" className="logo" />
+    </div>
+    <Link to="/home" className="sidebar-link">
+      <div className="sidebar-item">
+        <FaHome className="sidebar-icon" /> Home
+      </div>
+    </Link>
+    <Link to="/admin-projet" className="sidebar-link">
+      <div className="sidebar-item">
+        <FaFolder className="sidebar-icon" /> Competition
+      </div>
+    </Link>
+    <div className="sidebar-item">
+      <FiUsers className="sidebar-icon" /> Utilisateurs
+    </div>
+    <div className="sidebar-item">
+      <FaUserPen className="sidebar-icon" /> Evaluation
+    </div>
+  </div>
+);
 
 export default Parametre;

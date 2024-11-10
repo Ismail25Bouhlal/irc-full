@@ -2,15 +2,16 @@ import React, { useState, useEffect } from "react";
 import { FaHome, FaFolder } from "react-icons/fa";
 import "./projet.css";
 import logo from "../../../assets/irc-logo-rb.png";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const Projet = () => {
+  const [competitionsData, setCompetitionsData] = useState([]);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState("competition");
-  const [competitionsData, setCompetitionsData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [competitionsPerPage] = useState(5);
+  const navigate = useNavigate();
 
   useEffect(() => {
     axios
@@ -27,92 +28,100 @@ const Projet = () => {
     setSelectedItem(item);
   };
 
+  const handleApplyClick = (id) => {
+    const selectedCompetition = competitionsData.find(
+      (competition) => competition.idcompetition === id
+    );
+    if (selectedCompetition) {
+      navigate("/Forum_ProjectChercheur", {
+        state: { budgetParametreId: selectedCompetition.ID_budget_parametre },
+      });
+    }
+  };
+
+  // Filter only competitions that are online
+  const filteredCompetitions = competitionsData.filter(
+    (competition) => competition.enligne === "1"
+  );
+
+  // Calculate indices for pagination
   const indexOfLastCompetition = currentPage * competitionsPerPage;
   const indexOfFirstCompetition = indexOfLastCompetition - competitionsPerPage;
-  const currentCompetitions = competitionsData.slice(
+  const currentCompetitions = filteredCompetitions.slice(
     indexOfFirstCompetition,
     indexOfLastCompetition
   );
 
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  // Calculate total pages based on filtered competitions
+  const totalPages = Math.ceil(
+    filteredCompetitions.length / competitionsPerPage
+  );
 
-  const renderCompetitionCard = (competitionData) => {
-    return (
-      <div className="competition-card">
-        <h3 className="card-title">{competitionData.titre}</h3>
-        <p>
-          <strong>Libellé:</strong> {competitionData.libelle}
-        </p>
-        <p>
-          <strong>Date de début:</strong> {competitionData.date_debut}
-        </p>
-        <p>
-          <strong>Date de fin:</strong> {competitionData.date_fin}
-        </p>
-        <p>
-          <strong>En ligne:</strong>{" "}
-          {competitionData.enligne === "1" ? "Oui" : "Non"}
-        </p>
-        <p>
-          <strong>Année de compétition:</strong>{" "}
-          {competitionData.annee_competition}
-        </p>
-        <div className="action">
-          {competitionData.enligne === "1" ? (
-            <Link to={"/Forum_ProjectChercheur"}>
-              <button
-                className="apply-button"
-                onClick={() => console.log("Apply clicked")}
-              >
-                Appliquer
-              </button>
-            </Link>
-          ) : (
-            <span className="unavailable">Non disponible</span>
-          )}
-        </div>
-      </div>
-    );
-  };
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
     <div className={`projet-container ${isSidebarOpen ? "sidebar-open" : ""}`}>
       <div className="sidebar">
-        <>
-          <div className="logo-container">
-            <img src={logo} alt="IRC Logo" className="logo" />
+        <div className="logo-container">
+          <img src={logo} alt="IRC Logo" className="logo" />
+        </div>
+        <Link to="/home" style={{ textDecoration: "none" }}>
+          <div className="sidebar-item" onClick={handleToggleSidebar}>
+            <FaHome style={{ marginRight: "8px" }} />
+            Home
           </div>
-          <Link to="/home" style={{ textDecoration: "none" }}>
-            <div className="sidebar-item" onClick={handleToggleSidebar}>
-              <FaHome style={{ marginRight: "8px" }} />
-              Home
-            </div>
-          </Link>
-          <div
-            className={`sidebar-item ${
-              selectedItem === "competition" ? "active" : ""
-            }`}
-            onClick={() => handleItemClick("competition")}
-          >
-            <FaFolder style={{ marginRight: "8px" }} />
-            Competition
-          </div>
-        </>
+        </Link>
+        <div
+          className={`sidebar-item ${
+            selectedItem === "competition" ? "active" : ""
+          }`}
+          onClick={() => handleItemClick("competition")}
+        >
+          <FaFolder style={{ marginRight: "8px" }} />
+          Competition
+        </div>
       </div>
       <div className="content">
         {selectedItem === "competition" && (
           <div className="competition-container">
-            {currentCompetitions.map((competition, index) => (
-              <div key={index}>{renderCompetitionCard(competition)}</div>
+            {currentCompetitions.map((competition) => (
+              <div className="competition-card" key={competition.idcompetition}>
+                <h3 className="card-title">{competition.titre}</h3>
+                <p>
+                  <strong>Libellé:</strong> {competition.libelle}
+                </p>
+                <p>
+                  <strong>Date de début:</strong> {competition.date_debut}
+                </p>
+                <p>
+                  <strong>Date de fin:</strong> {competition.date_fin}
+                </p>
+                <p>
+                  <strong>Année de compétition:</strong>{" "}
+                  {competition.annee_competition}
+                </p>
+                <div className="action">
+                  {competition.enligne === "1" ? (
+                    <button
+                      className="apply-button"
+                      onClick={() =>
+                        handleApplyClick(competition.idcompetition)
+                      }
+                    >
+                      Appliquer
+                    </button>
+                  ) : (
+                    <span className="unavailable">Non disponible</span>
+                  )}
+                </div>
+              </div>
             ))}
           </div>
         )}
-        {/* Pagination */}
-        {competitionsData.length > competitionsPerPage && (
-          <ul className="pagination">
-            {Array(Math.ceil(competitionsData.length / competitionsPerPage))
-              .fill()
-              .map((_, i) => (
+        {totalPages > 1 && (
+          <div className="pagination-container">
+            <ul className="pagination">
+              {Array.from({ length: totalPages }, (_, i) => (
                 <li
                   key={i}
                   className={`page-item ${
@@ -124,7 +133,8 @@ const Projet = () => {
                   </button>
                 </li>
               ))}
-          </ul>
+            </ul>
+          </div>
         )}
       </div>
     </div>
