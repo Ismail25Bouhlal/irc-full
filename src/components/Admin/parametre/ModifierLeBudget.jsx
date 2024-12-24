@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import { FaHome, FaFolder } from "react-icons/fa";
@@ -11,8 +11,11 @@ const ModifierLeBudget = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
+  // Fetching budget data from the Parametre component
   const budgetToEdit = location.state?.budget || {};
+  console.log("Budget to Edit:", budgetToEdit);
 
+  // Initializing state variables
   const [appelation, setAppelation] = useState(
     budgetToEdit.budget_appellation || ""
   );
@@ -20,14 +23,22 @@ const ModifierLeBudget = () => {
     budgetToEdit.budget_date_creation ||
       new Date().toISOString().substring(0, 10)
   );
+  const [id, setId] = useState(budgetToEdit.id || "");
 
-  const [sections, setSections] = useState([...(budgetToEdit.sections || [])]);
-  const [groupements, setGroupements] = useState([
-    ...(budgetToEdit.groupements || []),
-  ]);
-  const [categories, setCategories] = useState([
-    ...(budgetToEdit.categories || []),
-  ]);
+  // Initialize sections, groupements, and categories
+  const [sections, setSections] = useState(budgetToEdit.sections || []);
+  const [groupements, setGroupements] = useState(
+    budgetToEdit.groupements || []
+  );
+  const [categories, setCategories] = useState(budgetToEdit.categories || []);
+
+  useEffect(() => {
+    console.log("Appellation:", appelation);
+    console.log("Creation Date:", creationDate);
+    console.log("Sections:", sections);
+    console.log("Groupements:", groupements);
+    console.log("Categories:", categories);
+  }, [appelation, creationDate, sections, groupements, categories]);
 
   const handleAddRow = (setData, defaultRow) =>
     setData((prev) => [...prev, defaultRow]);
@@ -35,26 +46,42 @@ const ModifierLeBudget = () => {
   const handleDeleteRow = (setData, index) =>
     setData((prev) => prev.filter((_, i) => i !== index));
 
-  const handleEditCell = (setData, index, field, value) => {
-    setData((prev) =>
-      prev.map((item, i) => (i === index ? { ...item, [field]: value } : item))
-    );
+  const handleEditCell = (setData, index, value) => {
+    setData((prev) => prev.map((item, i) => (i === index ? value : item)));
   };
 
   const handleUpdateBudget = () => {
     const updatedBudget = {
+      id: budgetToEdit.id, // Pass the ID of the budget to update
       appelation,
       creationDate,
-      sections,
-      groupements,
-      categories,
+      sections: sections.map((section, index) => ({
+        id: section.id || null, // Pass existing ID or null for new entries
+        appellation: section,
+      })),
+      groupements: groupements.map((groupement, index) => ({
+        id: groupement.id || null, // Pass existing ID or null for new entries
+        appellation: groupement,
+      })),
+      categories: categories.map((categorie, index) => ({
+        id: categorie.id || null, // Pass existing ID or null for new entries
+        appellation: categorie,
+      })),
     };
 
     axios
       .post("http://localhost/irc/updateBudget.php", updatedBudget)
-      .then(() => {
-        alert("Budget updated successfully!");
-        navigate("/parametre");
+      .then((response) => {
+        if (response.data.updatedData) {
+          console.log("Updated Budget Data:", response.data.updatedData);
+          alert("Budget updated successfully!");
+          navigate("/parametre", {
+            state: { updatedData: response.data.updatedData },
+          });
+        } else {
+          alert("Budget updated successfully, but no updated data returned.");
+          navigate("/parametre");
+        }
       })
       .catch((error) => {
         console.error("Error updating budget:", error);
@@ -64,6 +91,7 @@ const ModifierLeBudget = () => {
 
   return (
     <div className="d-flex">
+      {/* Sidebar */}
       <div className="sidebar">
         <div className="logo-container">
           <img src={logo} alt="IRC Logo" className="logo" />
@@ -90,6 +118,7 @@ const ModifierLeBudget = () => {
         </div>
       </div>
 
+      {/* Main Content */}
       <div className="content-add">
         <h2 style={{ color: "black" }}>Modifier le Budget</h2>
 
@@ -114,11 +143,10 @@ const ModifierLeBudget = () => {
           </div>
         </form>
 
+        {/* Sections */}
         <div className="table-section">
           <div className="table-header">
-            <button
-              onClick={() => handleAddRow(setSections, { appelation: "" })}
-            >
+            <button onClick={() => handleAddRow(setSections, "")}>
               Ajouter une Section
             </button>
           </div>
@@ -139,12 +167,7 @@ const ModifierLeBudget = () => {
                       type="text"
                       value={section || ""}
                       onChange={(e) =>
-                        handleEditCell(
-                          setSections,
-                          index,
-                          "appelation",
-                          e.target.value
-                        )
+                        handleEditCell(setSections, index, e.target.value)
                       }
                     />
                   </td>
@@ -159,11 +182,10 @@ const ModifierLeBudget = () => {
           </table>
         </div>
 
+        {/* Groupements */}
         <div className="table-section">
           <div className="table-header">
-            <button
-              onClick={() => handleAddRow(setGroupements, { appelation: "" })}
-            >
+            <button onClick={() => handleAddRow(setGroupements, "")}>
               Ajouter un Groupement
             </button>
           </div>
@@ -184,12 +206,7 @@ const ModifierLeBudget = () => {
                       type="text"
                       value={groupement || ""}
                       onChange={(e) =>
-                        handleEditCell(
-                          setGroupements,
-                          index,
-                          "appelation",
-                          e.target.value
-                        )
+                        handleEditCell(setGroupements, index, e.target.value)
                       }
                     />
                   </td>
@@ -206,11 +223,10 @@ const ModifierLeBudget = () => {
           </table>
         </div>
 
+        {/* Categories */}
         <div className="table-section">
           <div className="table-header">
-            <button
-              onClick={() => handleAddRow(setCategories, { appelation: "" })}
-            >
+            <button onClick={() => handleAddRow(setCategories, "")}>
               Ajouter une Catégorie
             </button>
           </div>
@@ -229,14 +245,9 @@ const ModifierLeBudget = () => {
                   <td>
                     <input
                       type="text"
-                      value={categorie|| ""}
+                      value={categorie || ""}
                       onChange={(e) =>
-                        handleEditCell(
-                          setCategories,
-                          index,
-                          "appelation",
-                          e.target.value
-                        )
+                        handleEditCell(setCategories, index, e.target.value)
                       }
                     />
                   </td>

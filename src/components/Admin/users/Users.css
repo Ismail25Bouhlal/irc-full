@@ -30,7 +30,6 @@
   width: 250%;
   overflow-x: auto; /* Horizontal scrolling */
   overflow-y: auto; /* Vertical scrolling */
-  max-height: 500px; 
   border: 1px solid #838383; /* Gray border */
 }
 

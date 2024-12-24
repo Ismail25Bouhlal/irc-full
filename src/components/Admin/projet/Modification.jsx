@@ -82,132 +82,135 @@ const Modification = () => {
           </div>
         </>
       </div>
-      <div className="contents" style={{ marginLeft: "130%" }}>
-        <div style={{ marginRight: "2%" }}>
-          <div className="add-competition">
-            <div className="app-card-body">
-              <form className="settings-form" onSubmit={handleSubmit}>
-                <h2 style={{ color: "black" }}>Modifier une competition</h2>
-                <div className="mb-3">
-                  <label htmlFor="titre" className="form-label">
-                    Nom de la competition
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="titre"
-                    name="titre"
-                    placeholder="Nom de la competition"
-                    value={titre}
-                    onChange={(e) => setTitre(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="libelle" className="form-label">
-                    Libelle
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="libelle"
-                    name="libelle"
-                    placeholder="Libelle"
-                    value={libelle}
-                    onChange={(e) => setLibelle(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="date_debut" className="form-label">
-                    Date début
-                  </label>
-                  <input
-                    type="date"
-                    className="form-control"
-                    id="date_debut"
-                    name="date_debut"
-                    value={dateDebut}
-                    onChange={(e) => setDateDebut(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="date_fin" className="form-label">
-                    Date fin
-                  </label>
-                  <input
-                    type="date"
-                    id="date_fin"
-                    className="form-control"
-                    name="date_fin"
-                    value={dateFin}
-                    onChange={(e) => setDateFin(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="annee_competition" className="form-label">
-                    Année de la compétition
-                  </label>
-                  <input
-                    type="text"
-                    id="annee_competition"
-                    className="form-control"
-                    name="annee_competition"
-                    placeholder="Année (ex: 2023)"
-                    value={anneeCompetition}
-                    onChange={(e) => setAnneeCompetition(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="mb-3">
-                  <label className="form-label">En ligne :</label>
-                  <label>
-                    Non{" "}
-                    <input
-                      type="radio"
-                      name="enligne"
-                      value="2"
-                      checked={enLigne === "2"}
-                      onChange={() => setEnLigne("2")}
-                    />
-                  </label>
-                  <label>
-                    Oui{" "}
-                    <input
-                      type="radio"
-                      name="enligne"
-                      value="1"
-                      checked={enLigne === "1"}
-                      onChange={() => setEnLigne("1")}
-                    />
-                  </label>
-                </div>
-                {/* <select
-                  id="budget"
-                  name="budget"
-                  className="form-control"
-                  value={selectedBudget}
-                  onChange={(e) => setSelectedBudget(e.target.value)}
-                  required
-                >
-                  <option value="">Select Budget</option>
-                  {budgets.map((budget) => (
-                    <option
-                      key={budget.ID_budget_parametre}
-                      value={budget.ID_budget_parametre}
-                    >
-                      {budget.appellation}
-                    </option>
-                  ))}
-                </select> */}
-                <button type="submit" className="btn app-btn-primary">
-                  Enregistrer
-                </button>
-              </form>
+      <div className="main-container">
+        <div className="form-card">
+          <h2 className="form-title">Modifier une competition</h2>
+          <form className="form-content" onSubmit={handleSubmit}>
+            <div className="form-group">
+              <label htmlFor="titre" className="form-label">
+                Nom de la competition
+              </label>
+              <input
+                type="text"
+                className="form-control"
+                id="titre"
+                name="titre"
+                placeholder="Nom de la competition"
+                value={titre}
+                onChange={(e) => setTitre(e.target.value)}
+                required
+              />
             </div>
-          </div>
+            <div className="form-group">
+              <label htmlFor="libelle" className="form-label">
+                Libelle
+              </label>
+              <input
+                type="text"
+                className="form-control"
+                id="libelle"
+                name="libelle"
+                placeholder="Libelle"
+                value={libelle}
+                onChange={(e) => setLibelle(e.target.value)}
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="date_debut" className="form-label">
+                Date début
+              </label>
+              <input
+                type="date"
+                className="form-control"
+                id="date_debut"
+                name="date_debut"
+                value={dateDebut}
+                onChange={(e) => setDateDebut(e.target.value)}
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="date_fin" className="form-label">
+                Date fin
+              </label>
+              <input
+                type="date"
+                id="date_fin"
+                className="form-control"
+                name="date_fin"
+                value={dateFin}
+                onChange={(e) => setDateFin(e.target.value)}
+                required
+              />
+            </div>
+            <div className="form-group full-width">
+              <label htmlFor="annee_competition" className="form-label">
+                Année de la compétition
+              </label>
+              <input
+                type="text"
+                id="annee_competition"
+                className="form-control"
+                name="annee_competition"
+                placeholder="Année (ex: 2023)"
+                value={anneeCompetition}
+                onChange={(e) => setAnneeCompetition(e.target.value)}
+                required
+              />
+            </div>
+            <div className="form-group full-width">
+              <label className="form-label">En ligne :</label>
+              <div className="radio-group">
+                <label>
+                  Non{" "}
+                  <input
+                    type="radio"
+                    name="enligne"
+                    value="2"
+                    checked={enLigne === "2"}
+                    onChange={() => setEnLigne("2")}
+                  />
+                </label>
+                <label>
+                  Oui{" "}
+                  <input
+                    type="radio"
+                    name="enligne"
+                    value="1"
+                    checked={enLigne === "1"}
+                    onChange={() => setEnLigne("1")}
+                  />
+                </label>
+              </div>
+            </div>
+            <div className="form-group full-width">
+              <label htmlFor="budget" className="form-label">
+                Budget
+              </label>
+              <select
+                id="budget"
+                name="budget"
+                className="form-control"
+                value={selectedBudget}
+                onChange={(e) => setSelectedBudget(e.target.value)}
+                required
+              >
+                <option value="">Select Budget</option>
+                {budgets.map((budget) => (
+                  <option
+                    key={budget.ID_budget_parametre}
+                    value={budget.ID_budget_parametre}
+                  >
+                    {budget.appellation}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <button type="submit" className="submit-button">
+              Enregistrer
+            </button>
+          </form>
         </div>
       </div>
     </div>

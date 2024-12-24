@@ -275,7 +275,7 @@ td {
 .equipe-section th,
 td {
   padding: 10px;
-  text-align: left;
+  /* text-align: left; */
   color: #000000;
 }
 
@@ -429,7 +429,6 @@ td {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-left: 30rem;
   padding: 40px; /* Prevent modal from sticking to screen edges */
 }
 

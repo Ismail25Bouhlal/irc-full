@@ -70,80 +70,50 @@ function Project() {
         </Link>
       </div>
       {selectedItem === "competition" && (
-        <Container
-          className="content"
-          style={{ marginTop: "1rem", marginLeft: "23%" }}
-        >
-          <div>
-            <h1 style={{ marginRight: "-40%", color: "black" }}>COMPETITION</h1>
-            <Link to={"/AjouteruneComp"}>
-              <button
-                className="btn btn-success mb-3"
-                style={{ marginRight: "20px" }}
-              >
-                + Ajouter une competition
-              </button>
-            </Link>
-            <table
-              className="table table-bordered table-hover"
-              style={{ width: "150%" }}
-            >
-              <thead>
-                <tr>
-                  <th scope="col">#</th>
-                  <th scope="col">Titre</th>
-                  <th scope="col">Libellé</th>
-                  <th scope="col">Date de début</th>
-                  <th scope="col">Date de fin</th>
-                  <th scope="col">enligne</th>
-                  <th scope="col">Date de competition</th>
-                  <th scope="col" className="text-center">
-                    Actions
-                  </th>
+        <div className="table-container">
+          <h1 className="table-title">COMPETITION</h1>
+          <Link to={"/AjouteruneComp"}>
+            <button className="add-btn">+ Ajouter une competition</button>
+          </Link>
+          <table className="competition-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Titre</th>
+                <th>Libellé</th>
+                <th>Date de début</th>
+                <th>Date de fin</th>
+                <th>En ligne</th>
+                <th>Date de competition</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {competitions.map((competition, index) => (
+                <tr key={index}>
+                  <td>{index + 1}</td>
+                  <td>{competition.titre}</td>
+                  <td>{competition.libelle}</td>
+                  <td>{competition.date_debut}</td>
+                  <td>{competition.date_fin}</td>
+                  <td>{competition.enligne === "1" ? "Oui" : "Non"}</td>
+                  <td>{competition.annee_competition}</td>
+                  <td>
+                    <button
+                      className="edit-btn"
+                      onClick={() => handleEditClick(competition)}
+                    >
+                      <MdModeEditOutline />
+                    </button>
+                    <button className="delete-btn">
+                      <MdDeleteForever />
+                    </button>
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {competitions.map((competition, index) => (
-                  <tr key={index}>
-                    <th scope="row">{index + 1}</th>
-                    <td>{competition.titre}</td>
-                    <td>{competition.libelle}</td>
-                    <td>{competition.date_debut}</td>
-                    <td>{competition.date_fin}</td>
-                    <td>{competition.enligne === "1" ? "Oui" : "Non"}</td>
-                    <td>{competition.annee_competition}</td>
-                    <td className="text-center">
-                        <button
-                        onClick={() => handleEditClick(competition)}
-                          style={{
-                            backgroundColor: "#007bff",
-                            color: "#fff",
-                            marginRight: "5px",
-                            border: "none",
-                            borderRadius: "10%",
-                          }}
-                        >
-                          <MdModeEditOutline />
-                        </button>
-
-                      <button
-                        style={{
-                          backgroundColor: "#dc3545",
-                          color: "#fff",
-                          marginRight: "5px",
-                          border: "none",
-                          borderRadius: "10%",
-                        }}
-                      >
-                        <MdDeleteForever />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </Container>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );

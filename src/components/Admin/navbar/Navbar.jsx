@@ -6,7 +6,8 @@ import { AiFillFolderOpen } from "react-icons/ai";
 import { FaUserMd } from "react-icons/fa";
 import { IoSettings } from "react-icons/io5";
 import { FaUsers } from "react-icons/fa";
-
+import { IoIosPeople } from "react-icons/io";
+import { LuFolderTree } from "react-icons/lu";
 
 const style = {
   container: {
@@ -34,7 +35,8 @@ const text = {
     color: "black",
     marginLeft: "auto",
     marginRight: "auto",
-    paddingLeft: "0.5rem",
+    marginTop: "5rem",
+    // paddingLeft: "0.5rem",
     color: "#000",
     fontFamily: '"Open Sans", sans-serif',
   },
@@ -91,7 +93,7 @@ const Navbar = () => {
                     <Link to="/admin-projet" className="hex-content">
                       <span className="hex-content-inner">
                         <i>
-                          <AiFillFolderOpen className="ic" />
+                          <LuFolderTree className="ic" />
                         </i>
                         <span className="title">Competitions</span>
                       </span>
@@ -154,11 +156,13 @@ const Navbar = () => {
                       <div></div>
                       <div></div>
                     </div>
-                    
+
                     <Link to="/parametre" className="hex-content">
                       <span className="hex-content-inner">
                         <span className="icon">
-                          <i><IoSettings className="ic" /></i>
+                          <i>
+                            <IoSettings className="ic" />
+                          </i>
                         </span>
                         <span className="title">Parmetre</span>
                       </span>
@@ -190,7 +194,9 @@ const Navbar = () => {
                     <a className="hex-content">
                       <span className="hex-content-inner">
                         <span className="icon">
-                          <i><FaUsers className="ic" /></i>
+                          <i>
+                            <FaUsers className="ic" />
+                          </i>
                         </span>
                         <span className="title">Utilisateurs</span>
                       </span>
@@ -208,7 +214,7 @@ const Navbar = () => {
                       </svg>
                     </a>
                   </Link>
-                  <div className="hexagon-item">
+                  <Link to="/Project_Soumissione" className="hexagon-item">
                     <div className="hex-item">
                       <div></div>
                       <div></div>
@@ -222,9 +228,11 @@ const Navbar = () => {
                     <a className="hex-content">
                       <span className="hex-content-inner">
                         <span className="icon">
-                          <i className="fa fa-life-ring"></i>
+                          <i>
+                            <AiFillFolderOpen className="ic" />
+                          </i>
                         </span>
-                        <span className="title">Works</span>
+                        <span className="title">Projets</span>
                       </span>
                       <svg
                         viewBox="0 0 173.20508075688772 200"
@@ -239,7 +247,7 @@ const Navbar = () => {
                         ></path>
                       </svg>
                     </a>
-                  </div>
+                  </Link>
                   <div className="hexagon-item">
                     <div className="hex-item">
                       <div></div>

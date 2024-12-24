@@ -28,14 +28,45 @@ const Projet = () => {
     setSelectedItem(item);
   };
 
-  const handleApplyClick = (id) => {
-    const selectedCompetition = competitionsData.find(
-      (competition) => competition.idcompetition === id
-    );
-    if (selectedCompetition) {
-      navigate("/Forum_ProjectChercheur", {
-        state: { budgetParametreId: selectedCompetition.ID_budget_parametre },
-      });
+  const handleApplyClick = async (input) => {
+    const selectedCompetition =
+      typeof input === "object"
+        ? input
+        : competitionsData.find((c) => c.idcompetition === input);
+
+    if (!selectedCompetition) {
+      console.error("Competition not found!");
+      return;
+    }
+
+    console.log("Selected Competition:", selectedCompetition);
+
+    try {
+      const response = await axios.get(
+        "http://localhost/irc/projets.php?action=getLastProjectId"
+      );
+
+      if (response.data.status === "success") {
+        const lastProjectId = Number(response.data.data.lastProjectId) || 0;
+        const newProjectId = lastProjectId + 1;
+
+        navigate("/Forum_ProjectChercheur", {
+          state: {
+            budgetParametreId: selectedCompetition.ID_budget_parametre,
+            projectId: newProjectId,
+          },
+        });
+        console.log("Selected Competition:", selectedCompetition);
+        console.log(
+          "ID_budget_parametre:",
+          selectedCompetition?.ID_budget_parametre
+        );
+      } else {
+        alert("Failed to fetch the last project ID: " + response.data.message);
+      }
+    } catch (error) {
+      console.error("Error fetching the last project ID:", error);
+      alert("There was an error fetching the last project ID!");
     }
   };
 
@@ -80,6 +111,14 @@ const Projet = () => {
           <FaFolder style={{ marginRight: "8px" }} />
           Competition
         </div>
+        <Link
+          to="/MyProject"
+          className="sidebar-item"
+          style={{ textDecoration: "none" }}
+        >
+          <FaFolder style={{ marginRight: "8px" }} />
+          My Project
+        </Link>
       </div>
       <div className="content">
         {selectedItem === "competition" && (

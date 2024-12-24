@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { FaHome, FaFolder } from "react-icons/fa";
 import { FaUserPen } from "react-icons/fa6";
 import { FiUsers } from "react-icons/fi";
-import "./projet.css";
+import "./AjouterComp.css";
 import logo from "../../../assets/irc-logo-rb.png";
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -100,114 +100,93 @@ const AjouterUneComp = () => {
             </div>
           </>
         </div>
-        <div style={{ marginLeft: "130%" }}>
-          <div className="add-competition">
-            <div className="app-card-body">
-              <form
-                className="settings-form"
-                id="create-competition-form"
-                onSubmit={handleSubmit}
-              >
-                <h2 style={{ color: "black" }}>Ajouter une competition</h2>
-                <div className="mb-3">
-                  <label htmlFor="titre" className="form-label">
-                    Nom de la competition
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="titre"
-                    name="titre"
-                    placeholder="Nom de la competition"
-                    required
-                  />
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="libelle" className="form-label">
-                    Libelle
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="libelle"
-                    name="libelle"
-                    placeholder="Libelle"
-                    required
-                  />
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="date_debut_compt" className="form-label">
-                    Date début
-                  </label>
-                  <input
-                    type="date"
-                    className="form-control"
-                    id="date_debut"
-                    name="date_debut"
-                    required
-                  />
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="date_fin_compt" className="form-label">
-                    Date fin
-                  </label>
-                  <input
-                    type="date"
-                    id="date_fin"
-                    className="form-control"
-                    name="date_fin"
-                    required
-                  />
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="annee_compt" className="form-label">
-                    Année de la compétition
-                  </label>
-                  <input
-                    type="text"
-                    id="annee_competition"
-                    className="form-control"
-                    name="annee_competition"
-                    placeholder="Année ( ex : 2023)"
-                    required
-                  />
-                </div>
-                <div className="mb-3" style={{ color: "black" }}>
-                  <label className="form-label">En ligne :</label>
+        <div className="main-container">
+          <div className="form-card">
+            <h2 className="form-title">Ajouter une competition</h2>
+            <form
+              className="form-content"
+              id="create-competition-form"
+              onSubmit={handleSubmit}
+            >
+              <div className="form-group">
+                <label htmlFor="titre">Nom de la competition</label>
+                <input
+                  type="text"
+                  id="titre"
+                  name="titre"
+                  placeholder="Nom de la competition"
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="libelle">Libelle</label>
+                <input
+                  type="text"
+                  id="libelle"
+                  name="libelle"
+                  placeholder="Libelle"
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="date_debut">Date début</label>
+                <input type="date" id="date_debut" name="date_debut" required />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="date_fin">Date fin</label>
+                <input type="date" id="date_fin" name="date_fin" required />
+              </div>
+
+              <div className="form-group full-width">
+                <label htmlFor="annee_competition">
+                  Année de la compétition
+                </label>
+                <input
+                  type="text"
+                  id="annee_competition"
+                  name="annee_competition"
+                  placeholder="Année (ex: 2023)"
+                  required
+                />
+              </div>
+
+              <div className="form-group full-width">
+                <label>En ligne :</label>
+                <div className="radio-group">
                   <label>
-                    Non <input type="radio" name="enligne" value="2" />
+                    <input type="radio" name="enligne" value="2" /> Non
                   </label>
                   <label>
-                    Oui <input type="radio" name="enligne" value="1" />
+                    <input type="radio" name="enligne" value="1" /> Oui
                   </label>
                 </div>
-                <div className="mb-3">
-                  <label htmlFor="budget" className="form-label">
-                    Budget
-                  </label>
-                  <select
-                    id="budget"
-                    name="ID_budget_parametre" // Backend expects this name
-                    className="form-control"
-                    value={selectedBudget}
-                    onChange={(e) => setSelectedBudget(e.target.value)} // Update selectedBudget with only the ID
-                    required
-                  >
-                    <option value="">Select Budget</option>
-                    {budgets.map((budget) => (
-                      <option key={budget.id} value={budget.id}>
-                        {" "}
-                        {/* value is only the ID */}
-                        {budget.appellation} {/* Display the name */}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <button type="submit" className="btn app-btn-primary">
-                  Enregistrer
-                </button>
-              </form>
-            </div>
+              </div>
+
+              <div className="form-group full-width">
+                <label htmlFor="budget">Budget</label>
+                <select
+                  id="budget"
+                  name="ID_budget_parametre"
+                  value={selectedBudget}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="">Select Budget</option>
+                  {budgets.map((budget) => (
+                    <option key={budget.id} value={budget.id}>
+                      {budget.appellation}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <button type="submit" className="submit-button">
+                ENREGISTRER
+              </button>
+            </form>
           </div>
         </div>
       </div>

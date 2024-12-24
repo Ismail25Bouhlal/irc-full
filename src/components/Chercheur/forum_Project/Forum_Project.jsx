@@ -6,6 +6,7 @@ import Cookies from "js-cookie";
 import { Link, useLocation } from "react-router-dom";
 import "./forum_Project.css";
 import Modal from "react-modal";
+import { Button } from "../../ui/button";
 
 const Forum_Project = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -22,12 +23,9 @@ const Forum_Project = () => {
 
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [newTeamName, setNewTeamName] = useState("");
+
   const [selectedProjectId, setSelectedProjectId] = useState(null);
-  const [selectedResearcherId, setSelectedResearcherId] = useState(null);
-  const [newTeamLeader, setNewTeamLeader] = useState("");
-  const [newTeamLeaderEmail, setNewTeamLeaderEmail] = useState("");
   const [teams, setTeams] = useState([]); // Initialize as an empty array
-  const [expandedTeamIndex, setExpandedTeamIndex] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [resumeFr, setResumeFr] = useState("");
   const [resumeEn, setResumeEn] = useState("");
@@ -36,6 +34,7 @@ const Forum_Project = () => {
   const [taskName, setTaskName] = useState("");
   const [taskDescription, setTaskDescription] = useState("");
   const [members, setMembers] = useState([]);
+  const [newMember, setNewMember] = useState([]);
   const [taskMember, setTaskMember] = useState("");
   const [taskStartDate, setTaskStartDate] = useState("");
   const [taskEndDate, setTaskEndDate] = useState("");
@@ -48,9 +47,6 @@ const Forum_Project = () => {
   const [competitionId, setCompetitionId] = useState("");
   const [competitionData, setCompetitionData] = useState(null);
 
-  const [teamId, setTeamId] = useState(null);
-  const [projectId, setProjectId] = useState(null);
-
   const [isFormVisiblePlaning, setIsFormVisiblePlaning] = useState(false);
   const [activity, setActivity] = useState("");
   const [description, setDescription] = useState("");
@@ -61,6 +57,7 @@ const Forum_Project = () => {
   const [planings, setPlanings] = useState([]);
   const [editIndex, setEditIndex] = useState(null);
   const [selectedDomain, setSelectedDomain] = useState("");
+  const [currentTeamIndex, setCurrentTeamIndex] = useState(null);
   const [formData, setFormData] = useState({
     projectTitle: "",
     startDate: "",
@@ -76,11 +73,27 @@ const Forum_Project = () => {
   const [filteredCategories, setFilteredCategories] = useState([]);
   const [filteredSections, setFilteredSections] = useState([]);
   const [idcompetition, setIdCompetition] = useState(null);
-  const [researcherId, setResearcherId] = useState(null);
+  const [memberRole, setMemberRole] = useState("");
+  const [memberTitle, setMemberTitle] = useState("");
+  const [memberEmail, setMemberEmail] = useState("");
+  const [speciality, setSpeciality] = useState("");
+  const [structure, setStructure] = useState("");
+  const [contribution, setContribution] = useState("");
+  const [workingTime, setWorkingTime] = useState("");
+  const [selectedTeamId, setSelectedTeamId] = useState(null);
+
+  const [savedBudgets, setSavedBudgets] = useState([]); // Store multiple saved budgets// To store the saved data
+  const [showForm, setShowForm] = useState(false);
 
   const location = useLocation(); // Get current location to retrieve query params
-  const budgetParametreId = location.state?.budgetParametreId || null;
-  console.log("Received budgetParametreId:", budgetParametreId);
+  const { budgetParametreId, projectId } = location.state || {};
+  console.log(
+    "Received budgetParametreId: , project id :",
+    budgetParametreId,
+    projectId
+  );
+
+  const [isAddingNewTeam, setIsAddingNewTeam] = useState(false); // Tracks if adding a new team
 
   // Extract competitionId from query params
   useEffect(() => {
@@ -107,6 +120,107 @@ const Forum_Project = () => {
       filterDataByBudgetParametre(budgetParametreId, data);
     }
   }, [budgetParametreId, data]);
+
+  const SaveDataBudget = () => {
+    // Extract values from the dropdowns and inputs
+    const sectionId = document.querySelector("select[name='section']").value;
+    const groupementId = document.querySelector(
+      "select[name='groupement']"
+    ).value;
+    const categorieId = document.querySelector(
+      "select[name='categorie']"
+    ).value;
+    const description = document.querySelector(
+      "input[name='description']"
+    ).value;
+    const budgetAmount = document.querySelector(
+      "input[name='budgetAmount']"
+    ).value;
+
+    // Get budgetParametreId and projectId from location.state
+    const { budgetParametreId, projectId } = location.state || {};
+
+    // Ensure all fields are filled, including budgetParametreId and projectId
+    if (
+      !sectionId ||
+      !groupementId ||
+      !categorieId ||
+      !description ||
+      !budgetAmount ||
+      !budgetParametreId ||
+      !projectId
+    ) {
+      alert("Please fill in all fields!");
+      return;
+    }
+
+    // Construct the data to send to the backend
+    const budgetData = {
+      section_id: sectionId,
+      groupement_id: groupementId,
+      categorie_id: categorieId,
+      description: description,
+      budget_amount: budgetAmount,
+      budget_parametre_id: budgetParametreId,
+      project_id: projectId,
+    };
+    console.log("Budget Data Sent:", budgetData);
+
+    // Send the data to the backend
+    fetch("http://localhost/irc/saveBudget.php", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(budgetData),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.message) {
+          alert(data.message);
+        }
+
+        if (data.data) {
+          const sectionName = filteredSections.find(
+            (section) =>
+              section.section_id.toString() ===
+              data.data.ID_ligne_budget_section.toString()
+          )?.section_appellation;
+
+          const groupementName = filteredGroupements.find(
+            (groupement) =>
+              groupement.groupement_id.toString() ===
+              data.data.ID_ligne_budget_groupement.toString()
+          )?.groupement_appellation;
+
+          const categorieName = filteredCategories.find(
+            (categorie) =>
+              categorie.categorie_id.toString() ===
+              data.data.ID_ligne_budget_categorie.toString()
+          )?.categorie_appellation;
+
+          const newBudget = {
+            ...data.data,
+            section_name: sectionName || "N/A",
+            groupement_name: groupementName || "N/A",
+            categorie_name: categorieName || "N/A",
+          };
+
+          setSavedBudgets((prevBudgets) => [...prevBudgets, newBudget]);
+
+          // Reset dropdowns and inputs to default values
+          document.querySelector("select[name='section']").value = "";
+          document.querySelector("select[name='groupement']").value = "";
+          document.querySelector("select[name='categorie']").value = "";
+          document.querySelector("input[name='description']").value = "";
+          document.querySelector("input[name='budgetAmount']").value = "";
+        }
+      })
+      .catch((error) => {
+        console.error("Error saving budget:", error);
+        alert("Failed to save budget. Please try again.");
+      });
+  };
 
   const filterDataByBudgetParametre = (budgetParametreId, data) => {
     if (!budgetParametreId) {
@@ -230,30 +344,54 @@ const Forum_Project = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSavePlaning = () => {
+  const handleSavePlaning = async () => {
+    const idchercheur = Cookies.get("idchercheur")
+      ? parseInt(Cookies.get("idchercheur"))
+      : null;
+    const idevaluateur = Cookies.get("idevaluateur")
+      ? parseInt(Cookies.get("idevaluateur"))
+      : null;
     const newPlaning = {
-      activity,
-      description,
-      team,
-      startDate,
-      endDate,
-      totalDays,
+      nom_Planning: activity, // Field matches your database column
+      Description_Planning: description,
+      id_equipe: team, // Assuming 'team' is the selected team ID
+      project_id: projectId,
+      debut_planning: startDate,
+      fin_planning: endDate,
+      nbr_jour_planning: totalDays,
+      idchercheur,
+      idevaluateur,
     };
-    if (editIndex !== null) {
-      const updatedPlanings = [...planings];
-      updatedPlanings[editIndex] = newPlaning;
-      setPlanings(updatedPlanings);
-      setEditIndex(null);
-    } else {
-      setPlanings([...planings, newPlaning]);
+
+    try {
+      const response = await axios.post(
+        "http://localhost/irc/save_planning.php",
+        newPlaning,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.data.success) {
+        alert("Planning saved successfully!");
+        setPlanings([...planings, newPlaning]); // Optionally update local state
+        // Clear form fields
+        setActivity("");
+        setDescription("");
+        setTeam("");
+        setStartDate("");
+        setEndDate("");
+        setTotalDays("");
+        setIsFormVisiblePlaning(false);
+      } else {
+        alert("Failed to save planning: " + response.data.message);
+      }
+    } catch (error) {
+      console.error("Error saving planning:", error);
+      alert("An error occurred while saving the planning.");
     }
-    setActivity("");
-    setDescription("");
-    setTeam("");
-    setStartDate("");
-    setEndDate("");
-    setTotalDays("");
-    setIsFormVisiblePlaning(false);
   };
 
   const handleEdit = (index) => {
@@ -356,8 +494,18 @@ const Forum_Project = () => {
   };
 
   const saveProjectData = async () => {
-    // Prepare the data structure to match what the backend expects
+    const idchercheur = Cookies.get("idchercheur")
+      ? parseInt(Cookies.get("idchercheur"))
+      : null;
+    const idevaluateur = Cookies.get("idevaluateur")
+      ? parseInt(Cookies.get("idevaluateur"))
+      : null;
+
+    const action = formData.projectId ? "updateProject" : "createProject";
+
     const dataToSend = {
+      action,
+      projectId: formData.projectId || null, // Include projectId for updates
       projectTitle: formData.projectTitle,
       startDate: formData.startDate,
       endDate: formData.endDate,
@@ -377,6 +525,8 @@ const Forum_Project = () => {
         results: results,
         ethics: ethics,
       },
+      idchercheur,
+      idevaluateur,
     };
 
     try {
@@ -384,35 +534,24 @@ const Forum_Project = () => {
         "http://localhost/irc/projets.php",
         dataToSend
       );
-      console.log("Project data saved successfully:", response.data);
-      alert("Project data saved successfully!");
+      console.log("Server response:", response.data);
+
+      if (response.data.status === "success") {
+        alert("Project data saved successfully!");
+
+        // Save returned projectId if it's a new project
+        if (!formData.projectId) {
+          setFormData((prev) => ({
+            ...prev,
+            projectId: response.data.data.projectId,
+          }));
+        }
+      } else {
+        alert("Failed to save project data: " + response.data.message);
+      }
     } catch (error) {
       console.error("Error saving project data:", error);
       alert("There was an error saving the project data!");
-    }
-  };
-
-  const savePlanningData = async () => {
-    const planningData = {
-      nom_Planning: activity,
-      Description_Planning: description,
-      id_equipe: teamId,
-      idprojet: projectId,
-      debut_planning: startDate,
-      fin_planning: endDate,
-      nbr_jour_planning: totalDays,
-    };
-
-    try {
-      const response = await axios.post(
-        "http://localhost/irc/save_planning.php",
-        planningData
-      );
-      console.log("Planning data saved successfully:", response.data);
-      alert("Planning data saved successfully!");
-    } catch (error) {
-      console.error("Error saving planning data:", error);
-      alert("There was an error saving the planning data!");
     }
   };
 
@@ -453,6 +592,269 @@ const Forum_Project = () => {
     }
   }, [email]);
   console.log("userInfo:", userInfo);
+  const handleAddMember = async () => {
+    if (
+      currentTeamIndex === null ||
+      currentTeamIndex === undefined ||
+      !teams[currentTeamIndex]
+    ) {
+      alert("Veuillez sélectionner une équipe valide.");
+      return;
+    }
+
+    const teamId = teams[currentTeamIndex]?.id; // Get the selected team's ID
+    if (!teamId) {
+      alert("L'équipe sélectionnée n'a pas d'ID valide.");
+      return;
+    }
+
+    // Prepare the request data
+    const requestData = {
+      teamId, // Pass the team ID
+      members: [
+        {
+          nom: newMember.nom,
+          prenom: newMember.prenom,
+          civility: newMember.civility || null,
+          role: memberRole || "",
+          titre: newMember.titre || "",
+          email: memberEmail || "",
+          specialite: speciality || "",
+          structure: structure || "",
+          contribution: contribution || "",
+          temps_de_travail: workingTime || "",
+        },
+      ],
+    };
+
+    console.log("Data being sent to backend:", requestData);
+
+    try {
+      // Send the request to the backend
+      const response = await axios.post(
+        "http://localhost/irc/save_equipe.php",
+        JSON.stringify(requestData),
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.data.success) {
+        alert("Membre ajouté avec succès!");
+
+        // Update local state with the new member
+        const updatedTeams = [...teams];
+
+        // Ensure the members array exists
+        if (!Array.isArray(updatedTeams[currentTeamIndex]?.members)) {
+          updatedTeams[currentTeamIndex].members = []; // Initialize members array
+        }
+
+        updatedTeams[currentTeamIndex].members.push(requestData.members[0]);
+        setTeams(updatedTeams);
+
+        // Reset the form fields
+        setShowForm(false);
+        setNewMember({ nom: "", prenom: "", civility: "" });
+        setMemberRole("");
+        setMemberEmail("");
+        setSpeciality("");
+        setStructure("");
+        setContribution("");
+        setWorkingTime("");
+      } else {
+        alert("Erreur lors de l'ajout du membre: " + response.data.message);
+      }
+    } catch (error) {
+      console.error("Erreur lors de l'ajout du membre:", error);
+      alert("Une erreur s'est produite lors de l'ajout du membre.");
+    }
+  };
+
+  useEffect(() => {
+    const fetchTeams = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost/irc/get_teamsMembers.php"
+        );
+        if (response.data.success) {
+          setTeams(response.data.teams); // Set teams with members
+          console.log("Fetched teams:", response.data.teams);
+        } else {
+          alert("Erreur lors de la récupération des équipes.");
+        }
+      } catch (error) {
+        console.error("Erreur lors de la récupération des équipes:", error);
+      }
+    };
+
+    fetchTeams();
+  }, []);
+
+  const handleSaveClick = async () => {
+    try {
+      // Get the project ID from the component state (assumed to be passed via props or state)
+      const { projectId } = location.state; // Or use props if passed differently
+
+      const idchercheur = Cookies.get("idchercheur")
+        ? parseInt(Cookies.get("idchercheur"))
+        : null;
+      const idevaluateur = Cookies.get("idevaluateur")
+        ? parseInt(Cookies.get("idevaluateur"))
+        : null;
+
+      // Send a request to create a new project
+      const response = await axios.post("http://localhost/irc/projets.php", {
+        action: "createEmptyProject",
+        idchercheur,
+        idevaluateur,
+      });
+
+      if (response.data.status === "success") {
+        alert("New project row created successfully!");
+      } else {
+        alert("Failed to create a new project row: " + response.data.message);
+      }
+    } catch (error) {
+      console.error("Error creating a new project row:", error);
+      alert("There was an error creating a new project row!");
+    }
+  };
+  const handleAddTeamClick = () => {
+    setIsAddingNewTeam(true); // User intends to create a new team
+    setIsFormVisible(true); // Show the form for creating a new team
+  };
+
+  const handleSaveTeam = async () => {
+    if (!newTeamName) {
+      alert("Please provide a team name.");
+      return;
+    }
+
+    // Prepare the new team object
+    const newTeam = {
+      teamName: newTeamName,
+      chefEquipe: userInfo.prenom,
+      emailChef: userInfo.email,
+      members: [], // Initialize with an empty members array
+    };
+
+    console.log("New team being prepared:", newTeam);
+
+    try {
+      const teamData = {
+        teamName: newTeam.teamName,
+        teamLeaderEmail: newTeam.emailChef,
+        members: [], // No members yet
+        idprojet: 1,
+        idchercheur: Cookies.get("idchercheur")
+          ? parseInt(Cookies.get("idchercheur"))
+          : null,
+        idevaluateur: Cookies.get("idevaluateur")
+          ? parseInt(Cookies.get("idevaluateur"))
+          : null,
+      };
+
+      console.log("Team data being sent to backend:", teamData);
+
+      // Send to backend
+      const response = await axios.post(
+        "http://localhost/irc/save_equipe.php",
+        JSON.stringify(teamData),
+        {
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+
+      console.log("Backend response:", response.data);
+
+      if (response.data.success) {
+        alert("Team created successfully!");
+
+        // Add the new team to the state with the ID returned from the backend
+        setTeams([...teams, { ...newTeam, id: response.data.teamId }]);
+        setNewTeamName(""); // Reset input
+        setIsFormVisible(false); // Hide form
+      } else {
+        alert("Failed to create the team: " + response.data.message);
+      }
+    } catch (error) {
+      console.error("Error creating team:", error);
+      alert("An error occurred while creating the team.");
+    }
+  };
+
+  const [selectedTeamIndex, setSelectedTeamIndex] = useState(null);
+
+  const saveAllDataToDatabase = async () => {
+    if (!teams || teams.length === 0) {
+      alert("There are no teams to save.");
+      return;
+    }
+
+    const idchercheur = Cookies.get("idchercheur")
+      ? parseInt(Cookies.get("idchercheur"))
+      : null;
+    const idevaluateur = Cookies.get("idevaluateur")
+      ? parseInt(Cookies.get("idevaluateur"))
+      : null;
+
+    try {
+      for (const team of teams) {
+        // Prepare team data
+        const teamData = {
+          teamName: team.teamName,
+          teamLeaderEmail: team.emailChef || userInfo.email,
+          members: team.members || [], // Include team members
+          idprojet: 1,
+          idchercheur,
+          idevaluateur,
+        };
+
+        console.log("Saving team to backend:", teamData);
+
+        const response = await axios.post(
+          "http://localhost/irc/save_equipe.php",
+          JSON.stringify(teamData),
+          {
+            headers: { "Content-Type": "application/json" },
+          }
+        );
+
+        if (!response.data.success) {
+          alert(
+            `Failed to save team ${team.teamName}: ` + response.data.message
+          );
+          return;
+        }
+      }
+
+      alert("All teams and members saved successfully!");
+    } catch (error) {
+      console.error("Error saving data:", error);
+      alert("An error occurred while saving the teams.");
+    }
+  };
+
+  console.log("team:", teams);
+
+  // Remove a team member by index
+  const handleRemoveMember = (memberIndex) => {
+    if (currentTeamIndex !== null) {
+      const updatedTeams = [...teams];
+      updatedTeams[currentTeamIndex].members.splice(memberIndex, 1);
+      setTeams(updatedTeams);
+    }
+  };
+
+  const openMemberModal = (index) => {
+    setCurrentTeamIndex(index); // Save the index of the selected team
+    setIsModalOpen(true); // Open the modal
+    console.log("Selected team index:", index);
+    console.log("Selected team:", teams[index]);
+  };
 
   useEffect(() => {
     // Fetch competition data
@@ -474,6 +876,19 @@ const Forum_Project = () => {
   }, [competitionId]);
   console.log("compititionid:", competitionId);
 
+  useEffect(() => {
+    const fetchTeams = async () => {
+      try {
+        const response = await axios.get("http://localhost/irc/get_teams.php");
+        console.log("Teams data:", response.data); // Log response data to check structure
+        setTeams(Array.isArray(response.data) ? response.data : []); // Only set if response is an array
+      } catch (error) {
+        console.error("Error fetching teams:", error);
+      }
+    };
+
+    fetchTeams();
+  }, []);
 
   const getTrueDomainsOfInterest = () => {
     if (!userInfo) {
@@ -527,7 +942,6 @@ const Forum_Project = () => {
     // Implement edit task functionality here
   };
 
-
   const handleDeleteTask = (planingIndex, taskIndex) => {
     const newTasks = { ...tasks };
     newTasks[planingIndex].splice(taskIndex, 1);
@@ -558,15 +972,21 @@ const Forum_Project = () => {
             Competition
           </div>
         </Link>
+        <Link
+          to="/MyProject"
+          className="sidebar-item"
+          style={{ textDecoration: "none" }}
+        >
+          <FaFolder style={{ marginRight: "8px" }} />
+          My Project
+        </Link>
       </div>
 
       <div className="dropdown-container">
         <div className="header-container">
-          <div className="record-id">
-            ID: {userInfo ? userInfo.email : "Loading..."}
-          </div>
+          <div className="record-id">ID: {projectId}</div>
           <div className="save-button">
-            <button>Enregistrer</button>
+            <button onClick={handleSaveClick}>Enregistrer</button>
           </div>
         </div>
         {/* Coordonnateur principal Dropdown */}
@@ -1014,129 +1434,377 @@ const Forum_Project = () => {
             </>
           </div>
         </div>
-        <div className="dropdown">
-          <div
-            className="dropdown-title-wrapper"
-            onClick={() => setIsFormVisible(!isFormVisible)}
-          >
-            <div className="dropdown-title">Créer votre équipe</div>
-            <div className="dropdown-flesh">&#x25B6;</div>
-          </div>
-          <div className={`dropdown-content ${isFormVisible ? "show" : ""}`}>
-            <>
-              <h1 style={{ color: "black" }}>Equipe</h1>
-              <div className="equipe-section">
-                <button onClick={() => setIsFormVisible(!isFormVisible)}>
-                  {isFormVisible ? "X" : "Ajouter Équipe"}
-                </button>
+        <div>
+          <div className="dropdown">
+            <div className="dropdown-title-wrapper" onClick={toggleDropdown5}>
+              <div className="dropdown-title">Créer votre équipe</div>
+              <div className="dropdown-flesh">&#x25B6;</div>
+            </div>
+            <div
+              className={`dropdown-content ${isDropdownOpen5 ? "show" : ""}`}
+            >
+              {!isFormVisible && (
+                <button onClick={handleAddTeamClick}>Ajouter une équipe</button>
+              )}
 
-                {isFormVisible && (
-                  <div className="form-container">
-                    <div>
-                      <p className="item">
-                        <strong>Nom d'équipe:</strong>
-                      </p>
-                      <input
-                        type="text"
-                        value={newTeamName}
-                        onChange={(e) => setNewTeamName(e.target.value)}
-                        placeholder="Nom d'équipe"
-                      />
-                    </div>
-                    <div>
-                      <p className="item">
-                        <strong>Chef d'équipe:</strong>
-                      </p>
-                      <input
-                        type="text"
-                        value={userInfo.prenom}
-                        placeholder="Chef d'équipe"
-                        readOnly
-                      />
-                    </div>
-                    <div>
-                      <p className="item">
-                        <strong>Email de chef d'équipe:</strong>
-                      </p>
-                      <input
-                        type="email"
-                        value={userInfo.email}
-                        placeholder="Email de chef d'équipe"
-                        readOnly
-                      />
-                    </div>
-                    <button>Ajouter Membre</button>
+              {!isFormVisible && teams.length > 0 && (
+                <>
+                  <h3>Équipe Détails</h3>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Nom d'équipe</th>
+                        <th>Chef d'équipe</th>
+                        <th>Email du chef</th>
+                        <th>Membres</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {teams.map((team, index) => (
+                        <tr
+                          key={index}
+                          className={
+                            selectedTeamIndex === index ? "selected-row" : ""
+                          }
+                        >
+                          <td>{team.teamName}</td>
+                          <td>{team.chefEquipe}</td>
+                          <td>{team.emailChef}</td>
+                          <td>
+                            <button
+                              onClick={() => openMemberModal(index)}
+                              className="show-members-btn"
+                            >
+                              Afficher les membres
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  <button onClick={closeDropdown5}>Annuler</button>
+                </>
+              )}
+
+              {isFormVisible && (
+                <div className="form-container">
+                  <h1 style={{ color: "black" }}>Nouvelle Équipe</h1>
+                  <div>
+                    <p>
+                      <strong>Nom d'équipe:</strong>
+                    </p>
+                    <input
+                      type="text"
+                      value={newTeamName}
+                      onChange={(e) => setNewTeamName(e.target.value)}
+                      placeholder="Nom d'équipe"
+                    />
                   </div>
-                )}
+                  <div>
+                    <p>
+                      <strong>Chef d'équipe:</strong>
+                    </p>
+                    <input
+                      type="text"
+                      value={userInfo.prenom}
+                      placeholder="Chef d'équipe"
+                      readOnly
+                    />
+                  </div>
+                  <div>
+                    <p>
+                      <strong>Email du chef:</strong>
+                    </p>
+                    <input
+                      type="email"
+                      value={userInfo.email}
+                      placeholder="Email du chef"
+                      readOnly
+                    />
+                  </div>
+                  <div className="dropdown-buttons">
+                    <button onClick={handleSaveTeam}>Enregistrer</button>
+                    <button onClick={() => setIsFormVisible(false)}>
+                      Annuler
+                    </button>
+                  </div>
+                </div>
+              )}
+              <button onClick={saveAllDataToDatabase}>Enregistrer tout</button>
+            </div>
+          </div>
 
-                <div>
-                  <p>
-                    <strong>Membres de l'équipe:</strong>
+          <Modal
+            isOpen={isModalOpen}
+            onRequestClose={() => setIsModalOpen(false)}
+            contentLabel="Team Members"
+            style={{
+              content: {
+                maxWidth: "600px",
+                margin: "auto",
+                borderRadius: "8px",
+                padding: "20px",
+                marginRight: "25rem",
+                boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
+                zIndex: "1000", // Ensure it is on top
+              },
+              overlay: {
+                backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent black
+                backdropFilter: "blur(5px)", // Apply the blur effect
+                zIndex: "999", // Ensure it's below the modal content
+              },
+            }}
+          >
+            <button
+              className="close-button"
+              onClick={() => setIsModalOpen(false)}
+              style={{
+                fontSize: "20px",
+                border: "none",
+                background: "none",
+                cursor: "pointer",
+                float: "right",
+              }}
+            >
+              &times;
+            </button>
+            <h4 style={{ textAlign: "center", marginBottom: "20px" }}>
+              Membres de l'équipe
+            </h4>
+
+            {/* Button to toggle the add member form */}
+            {!showForm && (
+              <Button onClick={() => setShowForm(true)} Ajouter un membre />
+            )}
+
+            {/* Display team members */}
+            {!showForm && (
+              <div style={{ marginBottom: "20px" }}>
+                {currentTeamIndex !== null &&
+                teams[currentTeamIndex]?.members?.length > 0 ? (
+                  <ul
+                    className="team-members-list"
+                    style={{ padding: "0", listStyle: "none" }}
+                  >
+                    {teams[currentTeamIndex].members.map(
+                      (member, memberIndex) => (
+                        <li
+                          key={memberIndex}
+                          className="team-member-item"
+                          style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            marginBottom: "10px",
+                          }}
+                        >
+                          <span style={{ fontSize: "16px" }}>
+                            {member.nom} {member.prenom} - {member.role}
+                          </span>
+                          <button
+                            onClick={() => handleRemoveMember(memberIndex)}
+                            style={{
+                              backgroundColor: "transparent",
+                              border: "1px solid #ccc",
+                              padding: "5px 10px",
+                              borderRadius: "4px",
+                              cursor: "pointer",
+                              fontSize: "14px",
+                              color: "#333",
+                            }}
+                          >
+                            Supprimer
+                          </button>
+                        </li>
+                      )
+                    )}
+                  </ul>
+                ) : (
+                  <p style={{ textAlign: "center", color: "#555" }}>
+                    Aucun membre ajouté.
                   </p>
-                  {members.map((member, index) => (
-                    <div key={index} className="member-form">
-                      <div>
-                        <p>Nom membre:</p>
-                        <input
-                          type="text"
-                          value={member.nom}
-                          placeholder="Nom membre"
-                        />
-                      </div>
-                      <div>
-                        <p>Prénom membre:</p>
-                        <input
-                          type="text"
-                          value={member.prenom}
-                          placeholder="Prénom membre"
-                        />
-                      </div>
-                      <button>
-                        Retirer
-                      </button>
-                    </div>
-                  ))}
+                )}
+              </div>
+            )}
+
+            {/* Form to add a new member */}
+            {showForm && (
+              <div className="p-8 bg-white rounded-lg shadow-lg max-w-4xl mx-auto">
+                <h4 className="text-2xl font-semibold text-gray-800 mb-6 text-center">
+                  Ajouter un Membre
+                </h4>
+
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                  {/* Nom */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 mb-2">
+                      Nom
+                    </label>
+                    <input
+                      type="text"
+                      value={newMember.nom}
+                      onChange={(e) =>
+                        setNewMember({ ...newMember, nom: e.target.value })
+                      }
+                      placeholder="Nom"
+                      className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    />
+                  </div>
+
+                  {/* Prénom */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 mb-2">
+                      Prénom
+                    </label>
+                    <input
+                      type="text"
+                      value={newMember.prenom}
+                      onChange={(e) =>
+                        setNewMember({ ...newMember, prenom: e.target.value })
+                      }
+                      placeholder="Prénom"
+                      className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    />
+                  </div>
+
+                  {/* Civilité */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 mb-2">
+                      Civilité
+                    </label>
+                    <input
+                      type="text"
+                      value={newMember.civility}
+                      onChange={(e) =>
+                        setNewMember({ ...newMember, civility: e.target.value })
+                      }
+                      placeholder="Civilité"
+                      className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    />
+                  </div>
+
+                  {/* Rôle dans l'équipe */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 mb-2">
+                      Rôle dans l'équipe
+                    </label>
+                    <input
+                      type="text"
+                      value={memberRole}
+                      onChange={(e) => setMemberRole(e.target.value)}
+                      placeholder="Rôle dans l'équipe"
+                      className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    />
+                  </div>
+
+                  {/* Titre */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 mb-2">
+                      Titre
+                    </label>
+                    <input
+                      type="text"
+                      value={newMember.titre}
+                      onChange={(e) =>
+                        setNewMember({ ...newMember, titre: e.target.value })
+                      }
+                      placeholder="Titre"
+                      className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    />
+                  </div>
+
+                  {/* Email */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 mb-2">
+                      Email
+                    </label>
+                    <input
+                      type="email"
+                      value={memberEmail}
+                      onChange={(e) => setMemberEmail(e.target.value)}
+                      placeholder="Email"
+                      className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    />
+                  </div>
+
+                  {/* Spécialité */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 mb-2">
+                      Spécialité
+                    </label>
+                    <input
+                      type="text"
+                      value={speciality}
+                      onChange={(e) => setSpeciality(e.target.value)}
+                      placeholder="Spécialité"
+                      className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    />
+                  </div>
+
+                  {/* Structure */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 mb-2">
+                      Structure
+                    </label>
+                    <input
+                      type="text"
+                      value={structure}
+                      onChange={(e) => setStructure(e.target.value)}
+                      placeholder="Structure"
+                      className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    />
+                  </div>
+
+                  {/* Contribution */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 mb-2">
+                      Contribution au projet
+                    </label>
+                    <input
+                      type="text"
+                      value={contribution}
+                      onChange={(e) => setContribution(e.target.value)}
+                      placeholder="Contribution au projet"
+                      className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    />
+                  </div>
+
+                  {/* Temps de travail */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 mb-2">
+                      Temps de travail
+                    </label>
+                    <input
+                      type="text"
+                      value={workingTime}
+                      onChange={(e) => setWorkingTime(e.target.value)}
+                      placeholder="Temps de travail"
+                      className="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    />
+                  </div>
                 </div>
 
-                {/* Display Data in Table */}
-                <h3>Équipe Détails</h3>
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Nom d'équipe</th>
-                      <th>Chef d'équipe</th>
-                      <th>Email du chef</th>
-                      <th>Membres</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>{newTeamName}</td>
-                      <td>{userInfo.prenom}</td>
-                      <td>{userInfo.email}</td>
-                      <td>
-                        <ul>
-                          {members.map((member, index) => (
-                            <li key={index}>
-                              {member.nom} {member.prenom}
-                            </li>
-                          ))}
-                        </ul>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+                {/* Action Buttons */}
+                <div className="mt-8 flex justify-end space-x-4">
+                  <button
+                    onClick={handleAddMember}
+                    className="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg shadow hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none"
+                  >
+                    Enregistrer
+                  </button>
 
-                <div className="dropdown-buttons">
-                  <button>Enregistrer</button>
-                  <button onClick={() => setIsFormVisible(false)}>
+                  <button
+                    onClick={() => setShowForm(false)}
+                    className="px-6 py-3 bg-gray-300 text-gray-800 font-medium rounded-lg shadow hover:bg-gray-400 focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 focus:outline-none"
+                  >
                     Annuler
                   </button>
                 </div>
               </div>
-            </>
-          </div>
+            )}
+          </Modal>
         </div>
+
         <div className="dropdown">
           <div className="dropdown-title-wrapper" onClick={toggleDropdown6}>
             <div className="dropdown-title">Planing</div>
@@ -1175,16 +1843,25 @@ const Forum_Project = () => {
                       placeholder="Description"
                     />
                   </div>
-                  <div className="planing-form-group">
-                    <p className="item">
-                      <strong>Équipe:</strong>
-                    </p>
-                    <input
-                      type="text"
-                      value={team}
-                      onChange={(e) => setTeam(e.target.value)}
-                      placeholder="Équipe"
-                    />
+                  <div className="planing-form-group-inline">
+                    <div className="planing-form-group">
+                      <p className="item">
+                        <strong>Équipe:</strong>
+                      </p>
+                      <select
+                        className="select-feild"
+                        value={team}
+                        onChange={(e) => setTeam(e.target.value)}
+                        placeholder="Sélectionnez une équipe"
+                      >
+                        <option value="">Sélectionnez une équipe</option>
+                        {teams.map((teamItem) => (
+                          <option key={teamItem.id} value={teamItem.id}>
+                            {teamItem.teamName}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
                   <div className="planing-form-group-inline">
                     <div className="planing-form-group">
@@ -1242,12 +1919,12 @@ const Forum_Project = () => {
                     <tbody>
                       {planings.map((planing, planingIndex) => (
                         <tr key={planingIndex}>
-                          <td>{planing.activity}</td>
-                          <td>{planing.description}</td>
-                          <td>{planing.team}</td>
-                          <td>{planing.startDate}</td>
-                          <td>{planing.endDate}</td>
-                          <td>{planing.totalDays}</td>
+                          <td>{planing.nom_Planning}</td>
+                          <td>{planing.Description_Planning}</td>
+                          <td>{planing.id_equipe}</td>
+                          <td>{planing.debut_planning}</td>
+                          <td>{planing.fin_planning}</td>
+                          <td>{planing.nbr_jour_planning}</td>
                           <td className="planing-dropdown-buttons">
                             <button onClick={() => handleEdit(planingIndex)}>
                               Modifier
@@ -1434,20 +2111,17 @@ const Forum_Project = () => {
           </div>
           <div className={`dropdown-content ${isDropdownOpen7 ? "show" : ""}`}>
             <h1 style={{ color: "black" }}>Budget</h1>
+
             <p className="item">
               <strong>Type de section</strong>
             </p>
-            <select className="select-feild">
+            <select className="select-feild" name="section">
               <option value="">Choisir votre Type de section</option>
-              {filteredSections.length > 0 ? (
-                filteredSections.map((section) => (
-                  <option key={section.section_id} value={section.section_id}>
-                    {section.section_appellation}
-                  </option>
-                ))
-              ) : (
-                <option disabled>Aucune section disponible</option>
-              )}
+              {filteredSections.map((section) => (
+                <option key={section.section_id} value={section.section_id}>
+                  {section.section_appellation}
+                </option>
+              ))}
             </select>
 
             <p className="item">
@@ -1455,6 +2129,7 @@ const Forum_Project = () => {
             </p>
             <select
               className="select-feild"
+              name="groupement"
               disabled={!filteredGroupements.length}
             >
               <option value="">Choisir votre Groupement Budget</option>
@@ -1473,6 +2148,7 @@ const Forum_Project = () => {
             </p>
             <select
               className="select-feild"
+              name="categorie"
               disabled={!filteredCategories.length}
             >
               <option value="">Choisir la Catégorie</option>
@@ -1489,50 +2165,54 @@ const Forum_Project = () => {
             <p className="item">
               <strong>Description</strong>
             </p>
-            <input type="text" placeholder="Description" />
+            <input type="text" name="description" placeholder="Description" />
+
             <p className="item">
               <strong>Montant Du Budget</strong>
             </p>
-            <input type="Number" placeholder="Montant Du Budget" />
+            <input
+              type="number"
+              name="budgetAmount"
+              placeholder="Montant Du Budget"
+            />
+            <div>
+              <h2>Saved Budgets</h2>
+              <table border="1">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Section</th>
+                    <th>Groupement</th>
+                    <th>Catégorie</th>
+                    <th>Description</th>
+                    <th>Montant</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {savedBudgets.map((budget, index) => (
+                    <tr key={index}>
+                      <td>{budget.id_budget_projet}</td>
+                      <td>{budget.section_name}</td>
+                      <td>{budget.groupement_name}</td>
+                      <td>{budget.categorie_name}</td>
+                      <td>{budget.valeur_description}</td>
+                      <td>{budget.valeur_montant}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
             <div className="dropdown-buttons">
-              <button onClick={handleSavePlaning}>Enregistrer</button>
+              <button onClick={SaveDataBudget}>Enregistrer</button>
               <button onClick={closeDropdown7}>Annuler</button>
             </div>
           </div>
+
+          {/* Display saved data */}
         </div>
+
         {/* Modal for displaying team members */}
-        <Modal
-          isOpen={isModalOpen}
-          onRequestClose={() => setIsModalOpen(false)}
-          contentLabel="Team Members"
-        >
-          <button
-            className="close-button"
-            onClick={() => setIsModalOpen(false)}
-          >
-            &times;
-          </button>
-          <h4>Membres de l'équipe</h4>
-          {expandedTeamIndex !== null &&
-          teams[expandedTeamIndex].members.length > 0 ? (
-            <ul className="team-members-list">
-              {teams[expandedTeamIndex].members.map((member, i) => (
-                <li key={i} className="team-member-item">
-                  <span>
-                    {member.name} ({member.role})
-                  </span>
-                  <button
-                    className="delete-member-button"
-                  >
-                    Supprimer
-                  </button>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p>Aucun membre ajouté.</p>
-          )}
-        </Modal>
       </div>
     </div>
   );

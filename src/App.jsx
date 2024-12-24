@@ -23,6 +23,8 @@ import AjouterUnBudget from "./components/Admin/parametre/AjouterUnBudget.jsx";
 import HomeEvaluateur from "./components/Evaluateur/Home.jsx";
 import ProfileSelection from "./components/profileselect/ProfileSelection.jsx";
 import ModifierLeBudget from "./components/Admin/parametre/ModifierLeBudget.jsx";
+import MyProject from "./components/Chercheur/MyProject/MyProject.jsx";
+import Project_Soumi from "./components/Admin/project_soumi/Project_Soumi.jsx";
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -34,7 +36,6 @@ const App = () => {
     setIsLoggedIn(true);
     setRole(role.toLowerCase());
     if (
-      role.toLowerCase() === "chercheur" ||
       role.toLowerCase() === "evaluateur"
     ) {
       navigate("/select-profile"); // Redirect to profile selection page
@@ -73,6 +74,7 @@ const App = () => {
           <Route path="/Evaluateur" element={<Evaluteur />} />
           <Route path="/AjouterUnBudget" element={<AjouterUnBudget />} />
           <Route path="/ModifierLeBudget" element={<ModifierLeBudget/>} />
+          <Route path="/Project_Soumissione" element={<Project_Soumi/>}/>
         </>
       )}
       {role === "chercheur" && (
@@ -85,6 +87,7 @@ const App = () => {
             path="/Forum_ProjectChercheur"
             element={<Forum_projectcherecheur />}
           />
+          <Route path="/MyProject" element={<MyProject/>}/>
         </>
       )}
       {role === "evaluateur" && (

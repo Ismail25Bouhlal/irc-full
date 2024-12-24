@@ -1,0 +1,85 @@
+/* General Layout */
+.my-project-wrapper {
+  display: flex;
+  min-height: 100vh;
+}
+
+.my-project-content {
+  margin: 0 auto; /* Center the content */
+  padding: 20px;
+  flex-grow: 1; /* Allow the content to take up remaining space */
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center content horizontally */
+  justify-content: center; /* Center content vertically */
+  margin-left: 37rem;
+}
+
+.title {
+  font-size: 24px;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+/* Table Styling */
+.project-table {
+  width: 170%; /* Adjust width for better centering */
+  max-width: 2000px; /* Limit the table width */
+  border-collapse: collapse;
+  background-color: #fff;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  border-radius: 8px; /* Add rounded corners */
+  overflow: hidden;
+}
+
+.project-table th,
+.project-table td {
+  padding: 12px 15px;
+  text-align: center; /* Center align text */
+  border: 1px solid #ddd;
+}
+
+.project-table th {
+  background-color: #4caf50;
+  color: white;
+  text-transform: uppercase;
+}
+
+.project-table td {
+  font-size: 14px;
+  color: #555;
+}
+
+/* Status Styles */
+.status-completed {
+  color: #28a745;
+  font-weight: bold;
+}
+
+.status-not-completed {
+  color: #dc3545;
+  font-weight: bold;
+}
+
+/* Button Styling */
+.complete-button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.complete-button:hover {
+  background-color: #0056b3;
+}
+
+/* No Projects Found */
+.no-projects {
+  font-size: 16px;
+  color: #666;
+  text-align: center;
+  margin-top: 20px;
+}

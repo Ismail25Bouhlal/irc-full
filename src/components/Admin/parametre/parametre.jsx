@@ -7,52 +7,13 @@ import { FaUserPen } from "react-icons/fa6";
 import logo from "../../../assets/irc-logo-rb.png";
 import "./parametre.css";
 
-// Helper function to group data by budget appellation
-const groupBudgetData = (data) => {
-  const grouped = {};
-
-  data.forEach((entry) => {
-    const {
-      budget_appellation,
-      budget_date_creation,
-      section,
-      groupement,
-      categorie,
-    } = entry;
-
-    // Initialize the budget object if not already present
-    if (!grouped[budget_appellation]) {
-      grouped[budget_appellation] = {
-        budget_appellation,
-        budget_date_creation,
-        sections: new Set(), // Using Set to avoid duplicate sections
-        groupements: new Set(), // Using Set to avoid duplicate groupements
-        categories: new Set(), // Using Set to avoid duplicate categories
-      };
-    }
-
-    // Add unique sections, groupements, and categories
-    grouped[budget_appellation].sections.add(section);
-    grouped[budget_appellation].groupements.add(groupement);
-    if (categorie) grouped[budget_appellation].categories.add(categorie); // Handle null categories
-  });
-
-  // Convert Sets to counts and return as an array
-  return Object.values(grouped).map((budget) => ({
-    ...budget,
-    sectionCount: budget.sections.size,
-    groupementCount: budget.groupements.size,
-    categorieCount: budget.categories.size,
-  }));
-};
-
 const Parametre = () => {
   const [budgetData, setBudgetData] = useState([]);
   const navigate = useNavigate();
 
   const handleEdit = (budget) => {
-    console.log("Selected Budget Data:", budget); // Debug to see the structure
-    navigate("/ModifierLeBudget", { state: { budget } }); // Ensure sections, groupements, and categories are arrays
+    console.log("Selected Budget Data:", budget);
+    navigate("/ModifierLeBudget", { state: { budget } });
   };
 
   // Fetch data from the backend
@@ -60,10 +21,8 @@ const Parametre = () => {
     axios
       .get("http://localhost/irc/getBudgetData.php")
       .then((response) => {
-        console.log("Raw Budget Data:", response.data); // Debug the raw data
-        const groupedData = groupBudgetData(response.data);
-        console.log("Grouped Budget Data:", groupedData); // Debug the grouped data
-        setBudgetData(groupedData);
+        console.log("Budget Data:", response.data);
+        setBudgetData(response.data); // Set the data directly since backend handles grouping/counting
       })
       .catch((error) => {
         console.error("Error fetching budget data:", error);
@@ -82,7 +41,7 @@ const Parametre = () => {
       )
     ) {
       alert(`Supprimé: ${budget.budget_appellation}`);
-      // Logic to delete the budget (e.g., API call to backend)
+      // Logic to delete the budget
     }
   };
 
@@ -105,7 +64,7 @@ const Parametre = () => {
               <th>Nombre de Sections</th>
               <th>Nombre de Groupements</th>
               <th>Nombre de Catégories</th>
-              <th>Actions</th> {/* New Actions Column */}
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
