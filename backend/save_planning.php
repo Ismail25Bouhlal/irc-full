@@ -1,17 +1,13 @@
 <?php
-// Enable error reporting for debugging
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// Allow requests from your React app
 header("Access-Control-Allow-Origin: http://localhost:3000");
 header("Access-Control-Allow-Headers: Content-Type");
 header('Content-Type: application/json; charset=UTF-8');
 
-// Include your database configuration file
 require_once('./config/dbconfig.php');
 
-// Get the JSON input from the request
 $input = json_decode(file_get_contents('php://input'), true);
 
 // Check if all required fields are present
